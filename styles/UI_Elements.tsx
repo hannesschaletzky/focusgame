@@ -21,13 +21,8 @@ export const Button = styled.a`
   }
 `;
 
+/* START */
 export const StartButton = styled.div`
-  position: absolute;
-  top: 40%;
-  left: 0; 
-  right: 0; 
-  margin-left: auto; 
-  margin-right: auto; 
   height: 50px;
   width: 100px;
 
@@ -47,8 +42,13 @@ export const StartButton = styled.div`
   }
 `;
 
-export const Item = styled.div`
+/* GAME */
+interface ItemProps {
+  color: string
+}
+
+export const Item = styled.div<ItemProps>`
   width: 20%;
   height: calc(100vh/20);
-  background-color: lightgreen;
+  background-color: ${({ color }) => color };
 `;

@@ -1,7 +1,12 @@
 import type { NextPage } from 'next'
+import { useState } from 'react';
 import Head from 'next/head'
 
-import { StartButton, Item } from '@/styles/UI_Elements';
+import { States } from '@/types/Enums';
+import Start from '@/components/Start';
+import Game from '@/components/Game';
+
+
 
 // import { useState } from 'react';
 // const [name, setName] = useState("");
@@ -16,16 +21,21 @@ import { StartButton, Item } from '@/styles/UI_Elements';
 
 const Home: NextPage = () => {
 
-  
+  //handle state
+  const [state, setState] = useState(States.Init);
+  const continueToState = (newState: States) => {
+    setState(newState)
+  }
 
-  const getItems = ():JSX.Element[] => {
-    let items:JSX.Element[] = []
-    Array.from(Array(100)).forEach((x, i) => {
-      items.push(
-        <Item>{i + 1}</Item>
-      )
-    });
-    return items
+  //determine content based on state
+  let content: JSX.Element = <div></div>
+  switch (state) {
+    case States.Init:
+      content = <Start continue={continueToState} />
+      break
+    case States.Game:
+      content = <Game continue={continueToState} />
+      break
   }
 
   return (
@@ -34,11 +44,8 @@ const Home: NextPage = () => {
         <title>Focus</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      
-      <StartButton>Start</StartButton>
-
-      <div className="flex justify-center items-center flex-wrap w-screen h-screen lg:border">
-        {getItems()}
+      <div className="flex justify-center items-center flex-wrap w-screen h-screen">
+        {content}
       </div>
     </>
   )
