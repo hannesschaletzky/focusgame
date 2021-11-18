@@ -1,62 +1,26 @@
-import { useState } from 'react';
-
 import { Item } from '@/styles/UI_Elements';
-import { States } from '@/types/Enums';
+import { States, Action } from '@/types/Enums';
 
-interface GameProps {
-  continue: (newState: States) => void
-}
+import { GameProps } from "@/types/Props"
 
 interface GameState {
   points: number;
   board: JSX.Element[];
+  solution: number;
 }
 const initGameState: GameState = {
   points: 0,
-  board: []
+  board: [],
+  solution: -1
 }
 
 const Game = (props: GameProps) => {
 
-  const [gameState, setGameState] = useState(initGameState);
-
-  //setup first round
-  if (gameState.board.length == 0) {
-    let board: JSX.Element[] = [];
-    Array.from(Array(100)).forEach((x, i) => {
-      board.push(
-        <Item color={"blue"} onClick={() => determine()} key={i}>{i + 1}</Item>
-      )
-    });
-    let newGameState: GameState = {
-      points: 0,
-      board: board
-    }
-    console.log("LETS PLAY")
-    setGameState(newGameState)
-  }
-
-  // check user selection 
-  const determine = () => {
-
-    let board: JSX.Element[] = [];
-    Array.from(Array(100)).forEach((x, i) => {
-      board.push(
-        <Item color={"red"} onClick={() => determine()} key={i}>{i + 1}</Item>
-      )
-    });
-
-    let newGameState: GameState = {
-      points: gameState.points += 1,
-      board: board
-    }
-    console.log(newGameState.points)
-    setGameState(newGameState)
-  }
-
   return (
     <>
-      {gameState.board}
+      <div onClick={() => props.store.dispatch({ type: Action.incr })}>+</div>
+      <br />
+      <div>{props.counter}</div>
     </>
   )
 }
@@ -64,6 +28,42 @@ const Game = (props: GameProps) => {
 export default Game
 
 
+
+
+
+ //new random board -> returns board and solution index
+  // const newField = ():[JSX.Element[], number] => {
+  //   let board = []
+  //   Array.from(Array(100)).forEach((x, i) => {
+  //     board.push(
+  //       <Item color={"white"} onClick={() => determine(i)} key={i}>{i + 1}</Item>
+  //     )
+  //   });
+  //   const solution = Math.floor(Math.random() * board.length);
+  //   board[solution] = <Item color={"green"} onClick={() => determine(solution)} key={solution}>{solution + 1}</Item>
+  //   return [board, solution]
+  // }
+
+  // //check user selection 
+  // const determine = (i:number) => {
+    
+  //   console.log(i)
+  //   console.log(gameState.solution)
+  //   if (i != gameState.solution) {
+  //     return
+  //   } 
+
+  //   console.log("CORRECT")
+  //   //setup next round
+  //   let board = newField()
+  //   let newGameState: GameState = {
+  //     points: gameState.points += 1,
+  //     board: board[0],
+  //     solution: board[1]
+  //   }
+  //   console.log(newGameState.points)
+  //   setGameState(newGameState)
+  // }
 
 
 

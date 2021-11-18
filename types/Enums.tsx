@@ -3,3 +3,9 @@ export enum States {
   Game,
   Scoreboard,
 }
+
+export enum Action {
+  init,
+  incr,
+  decr
+}

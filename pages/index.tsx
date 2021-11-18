@@ -1,11 +1,10 @@
 import type { NextPage } from 'next'
-import { useState } from 'react';
 import Head from 'next/head'
+import { createStore } from 'redux'
+import { useState } from 'react';
 
-import { States } from '@/types/Enums';
-import Start from '@/components/Start';
-import Game from '@/components/Game';
-
+import Wrapper from '@/components/Wrapper';
+import { Action } from '@/types/Enums';
 
 
 // import { useState } from 'react';
@@ -21,22 +20,30 @@ import Game from '@/components/Game';
 
 const Home: NextPage = () => {
 
-  //handle state
-  const [state, setState] = useState(States.Init);
-  const continueToState = (newState: States) => {
-    setState(newState)
-  }
+  // const [count, refresh] = useState(0)
 
-  //determine content based on state
-  let content: JSX.Element = <div></div>
-  switch (state) {
-    case States.Init:
-      content = <Start continue={continueToState} />
-      break
-    case States.Game:
-      content = <Game continue={continueToState} />
-      break
+  //init store
+  let initState = { value: 0 }
+  const counterReducer = (state:any = initState, action:any) => {
+    switch (action.type) {
+      case Action.incr:
+        //console.log(state.value)
+        return { value: state.value + 1 }
+      case Action.decr:
+        return { value: state.value - 1 }
+      default:
+        return state
+    }
   }
+  let store = createStore(counterReducer)
+  console.log("created redux store")
+
+  //subscribe to store
+  function handleChange() {
+    console.log("in subscribe listener: " + store.getState().value)
+  }
+  store.subscribe(handleChange)
+  console.log("subscribed to the store")
 
   return (
     <>
@@ -44,9 +51,7 @@ const Home: NextPage = () => {
         <title>Focus</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <div className="flex justify-center items-center flex-wrap w-screen h-screen">
-        {content}
-      </div>
+      <Wrapper store={store}/>
     </>
   )
 }
