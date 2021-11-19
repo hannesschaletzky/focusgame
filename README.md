@@ -1,5 +1,3 @@
-This is a boilerplate application for NextJS. 
+Practice your focus... 
 
-It includes: 
-- tailwindcss
-- styled components (server side rendered)
+Build with React, TypeScript, Redux and more... 
