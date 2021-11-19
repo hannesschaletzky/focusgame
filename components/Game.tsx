@@ -1,6 +1,6 @@
 import { Item } from '@/styles/UI_Elements';
-import { States, Action } from '@/types/Enums';
 import { useSelector, useDispatch } from 'react-redux'
+import { decrement, increment } from '@/store/features/counterSlice'
 
 interface GameState {
   points: number;
@@ -15,13 +15,14 @@ const initGameState: GameState = {
 
 const Game = () => {
 
-  const count = useSelector((state) => state.value)
+  const count = useSelector((state) => state.counter.value)
   console.log(count)
   const dispatch = useDispatch()
 
   return (
     <>
-      <div onClick={() => dispatch({ type: Action.incr })}>+</div>
+      <div onClick={() => dispatch(increment())}>Incr</div>
+      <div onClick={() => dispatch(decrement())}>Decr</div>
       <br />
       <div>{count}</div>
     </>

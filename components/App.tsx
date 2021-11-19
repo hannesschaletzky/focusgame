@@ -1,8 +1,7 @@
-import { States } from '@/types/Enums';
 import Start from '@/components/Start';
 import Game from '@/components/Game';
 
-const Wrapper = () => {
+const App = () => {
 
   //determine content based on state
   let content: JSX.Element = <div></div>
@@ -24,4 +23,4 @@ const Wrapper = () => {
   )
 }
 
-export default Wrapper
+export default App
