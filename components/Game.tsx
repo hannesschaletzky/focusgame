@@ -1,7 +1,6 @@
 import { Item } from '@/styles/UI_Elements';
 import { States, Action } from '@/types/Enums';
-
-import { GameProps } from "@/types/Props"
+import { useSelector, useDispatch } from 'react-redux'
 
 interface GameState {
   points: number;
@@ -14,13 +13,17 @@ const initGameState: GameState = {
   solution: -1
 }
 
-const Game = (props: GameProps) => {
+const Game = () => {
+
+  const count = useSelector((state) => state.value)
+  console.log(count)
+  const dispatch = useDispatch()
 
   return (
     <>
-      <div onClick={() => props.store.dispatch({ type: Action.incr })}>+</div>
+      <div onClick={() => dispatch({ type: Action.incr })}>+</div>
       <br />
-      <div>{props.counter}</div>
+      <div>{count}</div>
     </>
   )
 }

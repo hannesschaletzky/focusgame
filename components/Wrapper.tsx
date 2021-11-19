@@ -2,14 +2,11 @@ import { States } from '@/types/Enums';
 import Start from '@/components/Start';
 import Game from '@/components/Game';
 
-
-import { WrapperProps } from '@/types/Props';
-
-const Wrapper = (props: WrapperProps) => {
+const Wrapper = () => {
 
   //determine content based on state
   let content: JSX.Element = <div></div>
-  content = <Game store={props.store} counter={props.store.getState().value}/>
+  content = <Game />
 
   // switch (props.store.getState().page) {
   //   case States.Init:

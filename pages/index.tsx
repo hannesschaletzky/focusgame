@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { createStore } from 'redux'
-import { useState } from 'react';
+import { Provider } from 'react-redux'
 
 import Wrapper from '@/components/Wrapper';
 import { Action } from '@/types/Enums';
@@ -51,7 +51,9 @@ const Home: NextPage = () => {
         <title>Focus</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      <Wrapper store={store}/>
+      <Provider store={store}>
+        <Wrapper/>
+      </Provider>
     </>
   )
 }
