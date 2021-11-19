@@ -1,29 +1,48 @@
 import { Item } from '@/styles/UI_Elements';
 import { useAppSelector, useAppDispatch } from "@/app/hooks"
-import { decrement, increment } from '@/app/features/counterSlice'
-
-interface GameState {
-  points: number;
-  board: JSX.Element[];
-  solution: number;
-}
-const initGameState: GameState = {
-  points: 0,
-  board: [],
-  solution: -1
-}
+import { addPoint, setBoard, SetBoardPayload, setSolution } from '@/app/features/gameStateSlice'
 
 const Game = () => {
 
-  const count = useAppSelector((state) => state.counter.value)
+  let points = useAppSelector((state) => state.gameState.points)
+  let solution = useAppSelector((state) => state.gameState.solution)
   const dispatch = useAppDispatch()
+
+  console.log(solution)
+
+  const determine = (index:number) => {
+    dispatch(setBoard(newField()))
+  }
+
+  //new random board -> returns board and solution index
+  const newField = (): SetBoardPayload => {
+    let board = []
+    Array.from(Array(100)).forEach((x, i) => {
+      board.push(
+        <Item color={"white"} onClick={() => determine(i)} key={i}>{i + 1}</Item>
+      )
+    });
+    const solution = Math.floor(Math.random() * board.length);
+    board[solution] = <Item color={"green"} onClick={() => determine(solution)} key={solution}>{solution + 1}</Item>
+    return { board, solution }
+  }
+
+  //init first round
+  let board = useAppSelector((state) => state.gameState.board)
+  if (board.length == 0) {
+    let newBoard = newField()
+    console.log(newBoard)
+    dispatch(setBoard(newBoard))
+  }
 
   return (
     <>
-      <div onClick={() => dispatch(increment())}>Incr</div>
-      <div onClick={() => dispatch(decrement())}>Decr</div>
-      <br />
-      <div>{count}</div>
+    <div className="flex flex-row justify-center items-center flex-wrap w-screen h-screen">
+      {board}
+    </div>
+    <div className="flex justify-center items-center bg-gray-300">
+      {solution}
+    </div>
     </>
   )
 }
@@ -49,7 +68,7 @@ export default Game
 
   // //check user selection 
   // const determine = (i:number) => {
-    
+
   //   console.log(i)
   //   console.log(gameState.solution)
   //   if (i != gameState.solution) {

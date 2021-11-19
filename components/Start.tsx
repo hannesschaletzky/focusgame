@@ -9,7 +9,9 @@ const Start = () => {
   const dispatch = useAppDispatch()
 
   return (
-    <StartButton onClick={() => dispatch(next())}>Start</StartButton>
+    <div className="flex flex-col justify-center items-center flex-wrap w-screen h-screen">
+      <StartButton onClick={() => dispatch(next())}>Start</StartButton>
+    </div>
   )
 }
 

@@ -14,9 +14,9 @@ const App = () => {
   }
   
   return (
-    <div className="flex flex-col justify-center items-center flex-wrap w-screen h-screen">
+    <>
       {content}
-    </div>
+    </>
   )
 }
 
