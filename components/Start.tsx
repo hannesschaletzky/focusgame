@@ -1,13 +1,15 @@
+import { useAppDispatch } from "@/app/hooks"
+import { next } from '@/app/features/pageSlice'
+
 import { StartButton } from '@/styles/UI_Elements';
-import { States } from '@/types/Enums';
 
-interface StartProps {
-  continue: (newState: States) => void
-}
 
-const Start = (props:StartProps) => {
+const Start = () => {
+  
+  const dispatch = useAppDispatch()
+
   return (
-    <StartButton onClick={() => props.continue(States.Game)}>Start</StartButton>
+    <StartButton onClick={() => dispatch(next())}>Start</StartButton>
   )
 }
 

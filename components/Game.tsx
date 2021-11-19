@@ -1,7 +1,5 @@
 import { Item } from '@/styles/UI_Elements';
-
 import { useAppSelector, useAppDispatch } from "@/app/hooks"
-
 import { decrement, increment } from '@/app/features/counterSlice'
 
 interface GameState {
