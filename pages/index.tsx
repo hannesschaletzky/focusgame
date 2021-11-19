@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import { createStore } from 'redux'
 
-import store from '@/store/store'
+import { store } from '@/app/store'
 import { Provider } from 'react-redux'
 
 import App from '@/components/App';
