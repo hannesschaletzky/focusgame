@@ -1,37 +1,48 @@
 import Start from '@/components/Start';
 import Game from '@/components/Game';
+import Score from '@/components/Score';
 
-import { useAppSelector } from "@/app/hooks"
+import { useAppSelector, useAppDispatch } from "@/app/hooks"
 import { Points, Seconds } from '@/styles/UI_Elements';
+import { setColor } from '@/app/features/gameStateSlice';
+import { getRandomColor } from '@/app/colors';
+
+import { useEffect } from "react"
 
 const App = () => {
 
-  console.log("RENDER")
+  console.log("RENDER APP")
 
-  //start timer
-  // const id = setInterval(() => { 
-  //   console.log("TEST")
-  // }, 1000);
-  // setTimeout(() => clearInterval(id), 3001)
-
-  //determine content based on state
+  //read data from store
   const index = useAppSelector((state) => state.page.index)
   const points = useAppSelector((state) => state.gameState.points)
   const seconds = useAppSelector((state) => state.gameState.seconds)
+  const color = useAppSelector((state) => state.gameState.color)
+
+  //set inital values
+  useEffect(() => {
+    //console.log("set initial color")
+    //useAppDispatch()(setColor(getRandomColor()))
+  });
+
+  //determine content based on state
   let content: JSX.Element = <div></div>
-  switch(index) {
-    case 0: content = 
-      <Start />
+  switch (index) {
+    case 0: content =
+      <Start/>
       break
-    case 1: content = <>
-      <Points>{points}</Points>
-      <Game />
-      <Seconds>{seconds}</Seconds>
-    </>
-    
-     break
+    case 1: content =
+      <>
+        <Points>{points}</Points>
+        <Game />
+        <Seconds>{seconds}</Seconds>
+      </>
+      break
+    case 2: content =
+      <Score />
+      break
   }
-  
+
   return (
     <>
       {content}

@@ -11,6 +11,7 @@ const Game = () => {
   //let points = useAppSelector((state) => state.gameState.points)
   const dispatch = useAppDispatch()
   const board = useAppSelector((state) => state.gameState.board)
+  const color = useAppSelector((state) => state.gameState.color)
 
   //dispatch next round to store
   const nextRound = () => {
@@ -22,7 +23,7 @@ const Game = () => {
   const getNewBoard = (): JSX.Element[] => {
     let board = defaultBoard.slice()
     const solution = Math.floor(Math.random() * defaultBoardLength);
-    board[solution] = <Item color={"green"} onClick={() => nextRound()} key={solution}>{/*{solution + 1}*/}</Item>
+    board[solution] = <Item color={color} onClick={() => nextRound()} key={solution}>{/*{solution + 1}*/}</Item>
     return board
   }
 

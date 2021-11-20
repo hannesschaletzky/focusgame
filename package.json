@@ -12,6 +12,7 @@
     "@reduxjs/toolkit": "^1.6.2",
     "autoprefixer": "^10.4.0",
     "babel-plugin-styled-components": "^1.13.3",
+    "babel-preset-next": "^1.4.0",
     "next": "12.0.4",
     "postcss": "^8.3.11",
     "react": "17.0.2",

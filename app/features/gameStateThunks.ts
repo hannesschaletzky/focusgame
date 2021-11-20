@@ -1,18 +1,21 @@
 import { AnyAction } from 'redux'
 import { ThunkAction } from 'redux-thunk'
-import { reduceSecond } from './gameStateSlice'
+import { reduceSeconds, setSeconds } from './gameStateSlice'
+import { next } from '@/app/features/pageSlice'
 import { RootState } from '../store'
 
-export const thunkTimer = (): ThunkAction<void, RootState, unknown, AnyAction> =>
+export const thunkTimer = (seconds:number): ThunkAction<void, RootState, unknown, AnyAction> =>
   async dispatch => {
     // const asyncResp = await exampleAPI()
     // dispatch(reduceSecond())
     const ID = setInterval(() => {
-      dispatch(reduceSecond())
+      dispatch(reduceSeconds())
     }, 1000)
     setTimeout(() => {
       clearInterval(ID)
-    }, 5000)
+      //dispatch(setSeconds(0)) //hard-set to zero, bc. sometimes it stops at 1
+      dispatch(next())
+    }, seconds*1000)
   }
 
 // function exampleAPI() {
