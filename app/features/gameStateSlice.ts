@@ -1,9 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-// export interface SetBoardPayload {
-//   board: JSX.Element[];
-//   solution: number;
-// }
 interface GameState {
   points: number;
   board: JSX.Element[];

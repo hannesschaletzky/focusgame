@@ -5,10 +5,16 @@ import { RootState } from '../store'
 
 export const thunkTimer = (): ThunkAction<void, RootState, unknown, AnyAction> =>
   async dispatch => {
-    const asyncResp = await exampleAPI()
-    dispatch(reduceSecond())
+    // const asyncResp = await exampleAPI()
+    // dispatch(reduceSecond())
+    const ID = setInterval(() => {
+      dispatch(reduceSecond())
+    }, 1000)
+    setTimeout(() => {
+      clearInterval(ID)
+    }, 5000)
   }
 
-function exampleAPI() {
-  return Promise.resolve('Async Chat Bot')
-}
+// function exampleAPI() {
+//   return Promise.resolve('Async Chat Bot')
+// }
