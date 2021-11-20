@@ -1,38 +1,38 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-export interface SetBoardPayload {
-  board: JSX.Element[];
-  solution: number;
-}
+// export interface SetBoardPayload {
+//   board: JSX.Element[];
+//   solution: number;
+// }
 interface GameState {
   points: number;
   board: JSX.Element[];
-  solution: number;
+  seconds: number;
 }
 const initialState: GameState = {
   points: 0,
   board: [],
-  solution: -1
+  seconds: 5
 }
 
 export const gameStateSlice = createSlice({
   name: 'gameState',
   initialState,
   reducers: {
+    reduceSecond: (state) => {
+      console.log("REDUCED")
+      state.seconds -= 1
+    },
     addPoint: (state) => {
       state.points += 1
     },
-    setBoard: (state, action: PayloadAction<SetBoardPayload>) => {
-      state.board = action.payload.board
-      state.solution = action.payload.solution
-    },
-    setSolution: (state, action: PayloadAction<number>) => {
-      state.solution = action.payload
-    },
+    setBoard: (state, action: PayloadAction<JSX.Element[]>) => {
+      state.board = action.payload
+    }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { addPoint, setBoard, setSolution } = gameStateSlice.actions
+export const { addPoint, setBoard, reduceSecond } = gameStateSlice.actions
 
 export default gameStateSlice.reducer

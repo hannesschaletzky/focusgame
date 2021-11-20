@@ -50,5 +50,33 @@ interface ItemProps {
 export const Item = styled.div<ItemProps>`
   width: 20%;
   height: calc(100vh/20);
-  background-color: ${({ color }) => color };
+  background-color: ${({ color }) => color};
+`;
+
+export const Points = styled.div`
+  position: absolute;
+  top: 40%;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  //width: 10%;
+  text-align: center;
+  font-size: 10rem;
+  opacity: 0.2;
+  z-index: -10;
+`;
+
+export const Seconds = styled.div`
+  position: absolute;
+  bottom: 5%;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  //width: 10%;
+  text-align: center;
+  font-size: 5rem;
+  opacity: 0.1;
+  z-index: -10;
 `;
