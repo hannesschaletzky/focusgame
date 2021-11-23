@@ -17,12 +17,12 @@ const App = () => {
   const index = useAppSelector((state) => state.page.index)
   const points = useAppSelector((state) => state.gameState.points)
   const seconds = useAppSelector((state) => state.gameState.seconds)
-  const color = useAppSelector((state) => state.gameState.color)
+  const dispatch = useAppDispatch()
 
   //set inital values
   useEffect(() => {
-    //console.log("set initial color")
-    //useAppDispatch()(setColor(getRandomColor()))
+    console.log("set initial color")
+    dispatch(setColor(getRandomColor()))
   });
 
   //determine content based on state

@@ -11,7 +11,7 @@ const initialState: GameState = {
   points: 0,
   board: [],
   seconds: 5,
-  color: "blue"
+  color: "" //set by client
 }
 
 export const gameStateSlice = createSlice({

@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@/app/hooks"
 import { next } from '@/app/features/pageSlice'
-import { thunkTimer } from "@/app/features/gameStateThunks";
+import { thunkStartTimer } from "@/app/features/gameStateThunks";
 import { Item, StartButton } from '@/styles/UI_Elements';
 
 const Start = () => {
@@ -22,7 +22,7 @@ const Start = () => {
       <br />
       <StartButton onClick={() => {
         dispatch(next())
-        dispatch(thunkTimer(seconds))
+        dispatch(thunkStartTimer(seconds))
       }}>
         Start
       </StartButton>

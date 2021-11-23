@@ -4,7 +4,7 @@ import { reduceSeconds, setSeconds } from './gameStateSlice'
 import { next } from '@/app/features/pageSlice'
 import { RootState } from '../store'
 
-export const thunkTimer = (seconds:number): ThunkAction<void, RootState, unknown, AnyAction> =>
+export const thunkStartTimer = (seconds:number): ThunkAction<void, RootState, unknown, AnyAction> =>
   async dispatch => {
     // const asyncResp = await exampleAPI()
     // dispatch(reduceSecond())
