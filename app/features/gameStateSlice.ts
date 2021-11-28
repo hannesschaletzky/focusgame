@@ -10,7 +10,7 @@ interface GameState {
 const initialState: GameState = {
   points: 0,
   board: [],
-  seconds: 5,
+  seconds: 10,
   color: "" //set by client
 }
 
