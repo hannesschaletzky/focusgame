@@ -1,23 +1,27 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { getRandomColor } from "@/app/colors"
 
 interface GameState {
+  id: number;
   points: number;
-  board: JSX.Element[];
+  board: string[];
   seconds: number;
   color: string;
 }
 const initialState: GameState = {
+  id: 0,
   points: 0,
   board: [],
   seconds: 10,
-  color: "" //set by client
+  color: "" //set in SSR
 }
 
 export const gameStateSlice = createSlice({
   name: 'gameState',
   initialState,
   reducers: {
+    setID: (state, action: PayloadAction<number>) => {
+      state.id = action.payload
+    },
     setSeconds: (state, action: PayloadAction<number>) => {
       state.seconds = action.payload
     },
@@ -30,13 +34,13 @@ export const gameStateSlice = createSlice({
     setColor: (state, action: PayloadAction<string>) => {
       state.color = action.payload
     },
-    setBoard: (state, action: PayloadAction<JSX.Element[]>) => {
+    setBoard: (state, action: PayloadAction<string[]>) => {
       state.board = action.payload
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { addPoint, setBoard, reduceSeconds, setSeconds, setColor } = gameStateSlice.actions
+export const { setID, addPoint, setBoard, reduceSeconds, setSeconds, setColor } = gameStateSlice.actions
 
 export default gameStateSlice.reducer

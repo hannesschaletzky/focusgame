@@ -1,47 +1,46 @@
-import { Item } from '@/styles/UI_Elements';
-import { useAppSelector, useAppDispatch } from "@/app/hooks"
-import { addPoint, setBoard } from '@/app/features/gameStateSlice'
-
-//will be set in first round
-let defaultBoard:JSX.Element[] = [] 
-let defaultBoardLength: number = -1
+import { Item } from "@/styles/UI_Elements";
+import { useAppSelector, useAppDispatch } from "@/app/hooks";
+import { addPoint, setBoard } from "@/app/features/gameStateSlice";
 
 const Game = () => {
+  const dispatch = useAppDispatch();
+  const board = useAppSelector((state) => state.gameState.board);
+  const id = useAppSelector((state) => state.gameState.id);
 
-  //let points = useAppSelector((state) => state.gameState.points)
-  const dispatch = useAppDispatch()
-  const board = useAppSelector((state) => state.gameState.board)
-  const color = useAppSelector((state) => state.gameState.color)
+  //167.99.135.251
 
-  //dispatch next round to store
-  const nextRound = () => {
-    dispatch(addPoint())
-    dispatch(setBoard(getNewBoard()))
-  }
+  const check = async (index: number) => {
+    console.log(process.env);
 
-  //returns a new board
-  const getNewBoard = (): JSX.Element[] => {
-    let board = defaultBoard.slice()
-    const solution = Math.floor(Math.random() * defaultBoardLength);
-    board[solution] = <Item color={color} onClick={() => nextRound()} key={solution}>{/*{solution + 1}*/}</Item>
-    return board
-  }
+    // see: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+    const res = await fetch(
+      `http://${process.env.NEXT_PUBLIC_HOSTNAME}:${process.env.NEXT_PUBLIC_PORT}/focus/check`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `id=${id}&index=${index}`,
+      }
+    );
+    const data = await res.json();
+    console.log(data);
 
-  //init first round
-  if (board.length == 0) {
-    //set default board
-    Array.from(Array(100)).forEach((_, i) => {
-      defaultBoard.push(<Item color={"transparent"} key={i}>{/*{i + 1}*/}</Item>)
-    });
-    defaultBoardLength = defaultBoard.length
-    dispatch(setBoard(getNewBoard()))
-  }
+    if (!data) {
+      return;
+    }
+
+    dispatch(addPoint());
+    dispatch(setBoard(data));
+  };
 
   return (
     <div className="flex flex-row justify-center items-center flex-wrap w-screen h-screen">
-      {board}
+      {board.map((color, i) => (
+        <Item color={color} onClick={() => check(i)} key={i}></Item>
+      ))}
     </div>
-  )
-}
+  );
+};
 
-export default Game
+export default Game;

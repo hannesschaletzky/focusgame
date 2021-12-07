@@ -10,14 +10,18 @@ import App from "@/components/App";
 export interface InitData {
   id: number;
   color: string;
-  board: string[100];
+  board: string[];
 }
+
+//167.99.135.251
 
 // SSR only working on pages, not on components
 export const getServerSideProps = async () => {
-  const res = await fetch("http://167.99.135.251/focus/init");
+  const res = await fetch(
+    `http://${process.env.NEXT_PUBLIC_HOSTNAME}:${process.env.NEXT_PUBLIC_PORT}/focus/init`
+  );
   const data: InitData = await res.json();
-  console.log(`Game with id ${data.id} was created. Color: `);
+  console.log(`Game with id ${data.id} was created. Color: ${data.color}`);
   return {
     props: {
       data,
@@ -28,6 +32,9 @@ export const getServerSideProps = async () => {
 const Home = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  console.log("RENDER APP");
+  console.log(data);
+
   return (
     <>
       <Head>
