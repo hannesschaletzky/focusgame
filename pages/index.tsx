@@ -1,26 +1,33 @@
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import { createStore } from 'redux'
+import Head from "next/head";
+// SSR
+import { InferGetServerSidePropsType } from "next";
+// redux
+import { store } from "@/app/store";
+import { Provider } from "react-redux";
 
-import { store } from '@/app/store'
-import { Provider } from 'react-redux'
+import App from "@/components/App";
 
-import App from '@/components/App';
+export interface InitData {
+  id: number;
+  color: string;
+  board: string[100];
+}
 
+// SSR only working on pages, not on components
+export const getServerSideProps = async () => {
+  const res = await fetch("http://167.99.135.251/focus/init");
+  const data: InitData = await res.json();
+  console.log(`Game with id ${data.id} was created. Color: `);
+  return {
+    props: {
+      data,
+    },
+  };
+};
 
-// import { useState } from 'react';
-// const [name, setName] = useState("");
-// import { Input, Button } from '@/styles/UI_Elements'
-// <div className="flex flex-col justify-center items-center w-screen h-screen">
-//         <div className="mb-2">Enter a name:</div>
-//         <Input type="text" value={name} onChange={(e) => setName(e.target.value.trim())} />
-//         {name.length > 0 &&
-//           <Button href={"/game?name=" + name}>Let's play</Button>
-//         }
-//       </div>
-
-const Home: NextPage = () => {
-
+const Home = ({
+  data,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   return (
     <>
       <Head>
@@ -28,10 +35,10 @@ const Home: NextPage = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <Provider store={store}>
-        <App/>
+        <App {...data} />
       </Provider>
     </>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
