@@ -18,7 +18,7 @@ export interface InitData {
 // SSR only working on pages, not on components
 export const getServerSideProps = async () => {
   const res = await fetch(
-    `http://${process.env.NEXT_PUBLIC_HOSTNAME}:${process.env.NEXT_PUBLIC_PORT}/focus/init`
+    `http://${process.env.NEXT_PUBLIC_DBHOST}/focus/init`
   );
   const data: InitData = await res.json();
   console.log(`Game with id ${data.id} was created. Color: ${data.color}`);
