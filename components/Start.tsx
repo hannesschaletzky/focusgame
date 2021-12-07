@@ -7,6 +7,7 @@ function Start() {
   const dispatch = useAppDispatch();
   const seconds = useAppSelector((state) => state.gameState.seconds);
   const color = useAppSelector((state) => state.gameState.color);
+  const id = useAppSelector((state) => state.gameState.id);
 
   return (
     <div className="flex flex-col justify-center items-center flex-wrap w-screen h-screen">
@@ -21,7 +22,7 @@ function Start() {
       <StartButton
         onClick={() => {
           dispatch(next());
-          dispatch(thunkStartTimer(seconds));
+          dispatch(thunkStartTimer(seconds, id));
         }}
       >
         Start

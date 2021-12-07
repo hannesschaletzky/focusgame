@@ -13,8 +13,6 @@ export interface InitData {
   board: string[];
 }
 
-//167.99.135.251
-
 // SSR only working on pages, not on components
 export const getServerSideProps = async () => {
   const res = await fetch(

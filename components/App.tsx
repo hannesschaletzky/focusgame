@@ -18,10 +18,11 @@ const App: React.FC<InitData> = (props: InitData) => {
     dispatch(setBoard(props.board));
   });
 
-  //read game data
+  //read game data from store
   const index = useAppSelector((state) => state.page.index);
   const points = useAppSelector((state) => state.gameState.points);
   const seconds = useAppSelector((state) => state.gameState.seconds);
+  const board = useAppSelector((state) => state.gameState.board);
 
   //determine content based on state
   let content: JSX.Element = <div></div>;
@@ -33,7 +34,7 @@ const App: React.FC<InitData> = (props: InitData) => {
       content = (
         <>
           <Points>{points}</Points>
-          <Game />
+          <Game board={board} />
           <Seconds>{seconds}</Seconds>
         </>
       );
