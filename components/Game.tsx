@@ -14,7 +14,7 @@ const Game = () => {
 
     // see: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
     const res = await fetch(
-      `http://${process.env.NEXT_PUBLIC_DBHOST}/focus/init`,
+      `http://${process.env.NEXT_PUBLIC_DBHOST}/focus/check`,
       {
         method: "POST",
         headers: {
