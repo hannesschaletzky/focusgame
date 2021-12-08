@@ -6,7 +6,7 @@ import { next } from '@/app/features/pageSlice'
 import { RootState } from '../store'
 
 // finish game
-const finishGame = async (gameID:number) => {
+const finishGame = async (gameID:number, name:string) => {
   const res = await fetch(
     `http://${process.env.NEXT_PUBLIC_DBHOST}/focus/finish`,
     {
@@ -14,28 +14,39 @@ const finishGame = async (gameID:number) => {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: `id=${gameID}`,
+      body: `id=${gameID}&name=${name}`,
     }
   );
   const data = await res.json();
   console.log(data);
 }
 
-export const thunkStartTimer = (seconds:number, gameID:number): ThunkAction<void, RootState, unknown, AnyAction> =>
-  async dispatch => {
+export const thunkStartTimer = (): ThunkAction<void, RootState, unknown, AnyAction> =>
+  async (dispatch, getState) => {
+
+    //read data from store
+    const state = getState()
+    const name = state.gameState.name
+    const gameID = state.gameState.id
+    const seconds = state.gameState.seconds
+
     const ID = setInterval(() => {
       dispatch(reduceSeconds())
     }, 1000)
     setTimeout(() => {
       clearInterval(ID)
-      finishGame(gameID)
+      finishGame(gameID, name)
       //dispatch(setSeconds(0)) //hard-set to zero, bc. sometimes it stops at 1
       dispatch(next())
     }, seconds*1000)
   }
 
-export const thunkCheckClick = (id: number, index:number): ThunkAction<void, RootState, unknown, AnyAction> =>
-  async dispatch => {
+export const thunkCheckClick = (index:number): ThunkAction<void, RootState, unknown, AnyAction> =>
+  async (dispatch, getState) => {
+    //read data from store
+    const state = getState()
+    const gameID = state.gameState.id
+
     const res = await fetch(
       `http://${process.env.NEXT_PUBLIC_DBHOST}/focus/check`,
       {
@@ -43,7 +54,7 @@ export const thunkCheckClick = (id: number, index:number): ThunkAction<void, Roo
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: `id=${id}&index=${index}`,
+        body: `id=${gameID}&index=${index}`,
       }
     );
     const data = await res.json();

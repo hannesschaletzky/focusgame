@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface GameState {
   id: number;
+  name: string;
   points: number;
   board: string[];
   seconds: number;
@@ -9,6 +10,7 @@ interface GameState {
 }
 const initialState: GameState = {
   id: 0,
+  name: "",
   points: 0,
   board: [],
   seconds: 10,
@@ -21,6 +23,9 @@ export const gameStateSlice = createSlice({
   reducers: {
     setID: (state, action: PayloadAction<number>) => {
       state.id = action.payload
+    },
+    setName: (state, action: PayloadAction<string>) => {
+      state.name = action.payload
     },
     setSeconds: (state, action: PayloadAction<number>) => {
       state.seconds = action.payload
@@ -41,6 +46,6 @@ export const gameStateSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setID, addPoint, setBoard, reduceSeconds, setSeconds, setColor } = gameStateSlice.actions
+export const { setID, setName, addPoint, setBoard, reduceSeconds, setSeconds, setColor } = gameStateSlice.actions
 
 export default gameStateSlice.reducer
