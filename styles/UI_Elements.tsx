@@ -44,11 +44,11 @@ export const StartButton = styled.div`
 
 /* GAME */
 interface ItemProps {
-  color: string
+  color: string;
 }
 export const Item = styled.div<ItemProps>`
   width: 20%;
-  height: calc(100vh/20);
+  height: calc(100vh / 20);
   background-color: ${({ color }) => color};
 `;
 
@@ -63,7 +63,8 @@ export const Points = styled.div`
   text-align: center;
   font-size: 10rem;
   opacity: 0.2;
-  z-index: -10;
+  z-index: 1;
+  pointer-events: none;
 `;
 
 export const Seconds = styled.div`
@@ -77,5 +78,6 @@ export const Seconds = styled.div`
   text-align: center;
   font-size: 5rem;
   opacity: 0.1;
-  z-index: -10;
+  z-index: 1;
+  pointer-events: none;
 `;
