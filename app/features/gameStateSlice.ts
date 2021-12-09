@@ -15,7 +15,7 @@ const initialState: GameState = {
   name: "",
   points: 0,
   board: [],
-  seconds: 3,
+  seconds: 5,
   color: "", //set in SSR
   leaderboard: []
 }
@@ -36,8 +36,8 @@ export const gameStateSlice = createSlice({
     reduceSeconds: (state) => {
       state.seconds -= 1
     },
-    addPoint: (state) => {
-      state.points += 1
+    setPoints: (state, action: PayloadAction<number>) => {
+      state.points = action.payload
     },
     setColor: (state, action: PayloadAction<string>) => {
       state.color = action.payload
@@ -52,6 +52,6 @@ export const gameStateSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setID, setName, addPoint, setBoard, reduceSeconds, setSeconds, setColor, setLeaderboard } = gameStateSlice.actions
+export const { setID, setName, setPoints, setBoard, reduceSeconds, setSeconds, setColor, setLeaderboard } = gameStateSlice.actions
 
 export default gameStateSlice.reducer
