@@ -45,10 +45,11 @@ export const StartButton = styled.div`
 /* GAME */
 interface ItemProps {
   color: string;
+  height: number;
 }
 export const Item = styled.div<ItemProps>`
   width: 20%;
-  height: calc(100vh / 20);
+  height: calc(100vh / ${({ height }) => height});
   background-color: ${({ color }) => color};
 `;
 

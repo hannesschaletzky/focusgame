@@ -17,11 +17,12 @@ const Game: React.FC = () => {
   const board = useAppSelector((state) => state.gameState.board);
 
   return (
-    <div className="flex flex-wrap bg-gray-400">
+    <div className="h-full flex flex-wrap bg-gray-400">
       <Points>{points}</Points>
       {board.map((color, i) => (
         <Item
           color={color}
+          height={20}
           onClick={() => dispatch(thunkCheckClick(i))}
           key={i}
         />
