@@ -5,10 +5,6 @@ import { Points, Seconds } from "@/styles/UI_Elements";
 
 import { thunkCheckClick } from "@/app/features/gameStateThunks";
 
-interface GameProps {
-  board: string[];
-}
-
 const Game: React.FC = () => {
   const dispatch = useAppDispatch();
 

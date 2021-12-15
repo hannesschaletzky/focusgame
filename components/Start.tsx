@@ -37,6 +37,7 @@ function Start() {
       {name.length == 0 && <div>Enter a name to start</div>}
       <Input
         type="text"
+        maxLength={12}
         value={name}
         onChange={(e) => inputChanged(e.target.value.trim())}
       />
