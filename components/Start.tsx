@@ -32,13 +32,12 @@ function Start() {
     <div className="flex flex-col justify-center items-center flex-wrap w-screen h-screen">
       <div>Click as many {color} squares as you can...</div>
       <div>They look like this:</div>
-      <Item color={color} height={20} />
+      <Item color={color} height={"100% / 20"} />
       <br />
       {name.length == 0 && <div>Enter a name to start</div>}
       <Input
         type="text"
         value={name}
-        placeholder="..."
         onChange={(e) => inputChanged(e.target.value.trim())}
       />
       <br />

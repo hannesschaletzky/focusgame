@@ -23,7 +23,7 @@ const Score = () => {
           title={player.created_at}
         >
           <div>{player.points}</div>
-          <Item color={player.color} height={40} />
+          <Item color={player.color} height={"100vh / 40"} />
           <div className="flex-1">{player.name}</div>
           <div>{parseDate(player.created_at)} </div>
         </div>
