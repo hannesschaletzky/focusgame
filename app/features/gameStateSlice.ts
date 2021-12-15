@@ -10,13 +10,14 @@ interface GameState {
   color: string;
   leaderboard: LeaderboardPlayer[];
 }
+// color & board set in SSR
 const initialState: GameState = {
   id: 0,
   name: "",
   points: 0,
   board: [],
-  seconds: 5,
-  color: "", //set in SSR
+  seconds: 10,
+  color: "", 
   leaderboard: []
 }
 

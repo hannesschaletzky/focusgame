@@ -29,7 +29,7 @@ const Home = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   console.log("RENDER APP");
-  console.log(data);
+  //console.log(data);
 
   return (
     <>

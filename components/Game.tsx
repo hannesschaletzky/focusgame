@@ -17,7 +17,7 @@ const Game: React.FC = () => {
   const board = useAppSelector((state) => state.gameState.board);
 
   return (
-    <div className="flex flex-row justify-center items-center flex-wrap w-screen h-screen">
+    <div className="flex flex-wrap bg-gray-400">
       <Points>{points}</Points>
       {board.map((color, i) => (
         <Item
