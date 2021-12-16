@@ -31,12 +31,18 @@ function Start() {
 
   return (
     <div className="fixed top-0 left-0 bottom-0 right-0 flex flex-col justify-center items-center flex-wrap">
-      {/* <div className="fixed top-8 left-5">
-        Made by{" "}
-        <u>
-          <a href="https://www.hschaletzky.com">Hannes Schaletzky</a>
-        </u>
-      </div> */}
+      {/* GitHub Icon */}
+      <a
+        href="https://github.com/hannesschaletzky/focusgame"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <div className="fixed top-5 right-5">
+          <Image src="/github.png" alt="GitHub" width={40} height={40} />
+        </div>
+      </a>
+
+      {/* Content */}
       <div>Click as many {color} squares as you can...</div>
       <div>They look like this:</div>
       <Item color={color} height={"100% / 20"} />
@@ -53,16 +59,14 @@ function Start() {
         <StartButton onClick={() => start()}>Start</StartButton>
       )}
       <br />
+
+      {/* Footer */}
       <em
         className="fixed bottom-4"
         onClick={() => dispatch(showLeaderboard())}
       >
         Leaderboard
       </em>
-
-      <div className="fixed top-5 right-5">
-        <Image src="/github.png" alt="GitHub" width={40} height={40} />
-      </div>
     </div>
   );
 }
