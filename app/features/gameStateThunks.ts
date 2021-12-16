@@ -2,7 +2,7 @@ import { AnyAction } from 'redux'
 import { ThunkAction } from 'redux-thunk'
 import { reduceSeconds, setSeconds, setLeaderboard } from './gameStateSlice'
 import { setPoints, setBoard } from "@/app/features/gameStateSlice";
-import { next } from '@/app/features/pageSlice'
+import { showLeaderboard } from '@/app/features/pageSlice'
 import { RootState } from '../store'
 
 import { LeaderboardPlayer } from '@/types/games';
@@ -82,6 +82,6 @@ export const getLeaderboard = (): ThunkAction<void, RootState, unknown, AnyActio
     );
     const data:LeaderboardPlayer[] = await res.json();
     console.log("Leaderboard received");
-    dispatch(setLeaderboard(data))
-    dispatch(next())
+    dispatch(setLeaderboard(data as LeaderboardPlayer[]))
+    dispatch(showLeaderboard())
   }

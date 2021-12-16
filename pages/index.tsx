@@ -16,7 +16,6 @@ export interface InitData {
 
 export interface SSR_Data {
   init: InitData;
-  leaderboard: LeaderboardPlayer[];
 }
 
 // SSR only working on pages, not on components
@@ -24,14 +23,8 @@ export const getServerSideProps = async () => {
   const res_init = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/init`);
   const data_init: InitData = await res_init.json();
 
-  const res_leaderboard = await fetch(
-    `${process.env.NEXT_PUBLIC_DBHOST}/leaderboard`
-  );
-  const data_leaderboard: LeaderboardPlayer[] = await res_leaderboard.json();
-
   const data: SSR_Data = {
     init: data_init,
-    leaderboard: data_leaderboard,
   };
 
   return {

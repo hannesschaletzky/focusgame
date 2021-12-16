@@ -2,7 +2,10 @@ import Image from "next/image";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { next, showLeaderboard } from "@/app/features/pageSlice";
 import { useEffect } from "react";
-import { thunkStartTimer } from "@/app/features/gameStateThunks";
+import {
+  thunkStartTimer,
+  getLeaderboard,
+} from "@/app/features/gameStateThunks";
 import { Input, Item, StartButton } from "@/styles/UI_Elements";
 import { setName } from "@/app/features/gameStateSlice";
 
@@ -61,10 +64,7 @@ function Start() {
       <br />
 
       {/* Footer */}
-      <em
-        className="fixed bottom-4"
-        onClick={() => dispatch(showLeaderboard())}
-      >
+      <em className="fixed bottom-4" onClick={() => dispatch(getLeaderboard())}>
         Leaderboard
       </em>
     </div>
