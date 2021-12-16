@@ -18,11 +18,14 @@ export const pageSlice = createSlice({
     },
     next: (state) => {
       state.index += 1
+    },
+    showLeaderboard: (state) => {
+      state.index = 2
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { reset, next } = pageSlice.actions
+export const { reset, next, showLeaderboard } = pageSlice.actions
 
 export default pageSlice.reducer

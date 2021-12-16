@@ -11,7 +11,7 @@ const Score = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center flex-wrap w-screen h-screen">
+    <div className="fixed top-0 left-0 bottom-0 right-0 flex flex-col justify-center items-center flex-wrap">
       <div>
         You scored: <strong>{points} points</strong>
       </div>

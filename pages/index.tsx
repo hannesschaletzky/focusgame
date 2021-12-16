@@ -5,6 +5,7 @@ import { InferGetServerSidePropsType } from "next";
 import { store } from "@/app/store";
 import { Provider } from "react-redux";
 
+import { LeaderboardPlayer } from "@/types/games";
 import App from "@/components/App";
 
 export interface InitData {
@@ -13,11 +14,26 @@ export interface InitData {
   board: string[];
 }
 
+export interface SSR_Data {
+  init: InitData;
+  leaderboard: LeaderboardPlayer[];
+}
+
 // SSR only working on pages, not on components
 export const getServerSideProps = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/init`);
-  const data: InitData = await res.json();
-  console.log(`Game with id ${data.id} was created. Color: ${data.color}`);
+  const res_init = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/init`);
+  const data_init: InitData = await res_init.json();
+
+  const res_leaderboard = await fetch(
+    `${process.env.NEXT_PUBLIC_DBHOST}/leaderboard`
+  );
+  const data_leaderboard: LeaderboardPlayer[] = await res_leaderboard.json();
+
+  const data: SSR_Data = {
+    init: data_init,
+    leaderboard: data_leaderboard,
+  };
+
   return {
     props: {
       data,
