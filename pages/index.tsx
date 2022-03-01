@@ -5,26 +5,26 @@ import { InferGetServerSidePropsType } from "next";
 import { store } from "@/app/store";
 import { Provider } from "react-redux";
 
-import { LeaderboardPlayer } from "@/types/games";
 import App from "@/components/App";
-
-export interface InitData {
-  id: number;
-  color: string;
-  board: string[];
-}
-
-export interface SSR_Data {
-  init: InitData;
-}
+import { Board, InitialState } from "@/utils/types";
+import { constructBoard } from "@/utils/board";
 
 // SSR only working on pages, not on components
 export const getServerSideProps = async () => {
-  const res_init = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/init`);
-  const data_init: InitData = await res_init.json();
+  // const res_init = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/init`);
+  // const data_init: InitData = await res_init.json();
 
-  const data: SSR_Data = {
-    init: data_init,
+  let color = "black";
+  let boards: Board[] = [];
+
+  while (boards.length < 10) {
+    boards.push(constructBoard(color));
+  }
+
+  const data: InitialState = {
+    id: 1,
+    color: color,
+    boards: boards,
   };
 
   return {
@@ -37,8 +37,7 @@ export const getServerSideProps = async () => {
 const Home = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  console.log("RENDER APP");
-  //console.log(data);
+  console.log(data);
 
   return (
     <>

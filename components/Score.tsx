@@ -2,7 +2,7 @@ import { useAppSelector } from "@/app/hooks";
 import { StartButton, Item } from "@/styles/UI_Elements";
 
 const Score = () => {
-  const points = useAppSelector((state) => state.gameState.points);
+  const round = useAppSelector((state) => state.gameState.round);
   const leaderboard = useAppSelector((state) => state.gameState.leaderboard);
 
   const parseDate = (input: string) => {
@@ -13,7 +13,7 @@ const Score = () => {
   return (
     <div className="fixed top-0 left-0 bottom-0 right-0 flex flex-col justify-center items-center flex-wrap">
       <div>
-        You scored: <strong>{points} points</strong>
+        You scored: <strong>{round}</strong>
       </div>
       <br />
       {leaderboard.map((player, i) => (

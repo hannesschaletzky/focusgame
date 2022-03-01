@@ -1,11 +1,11 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { LeaderboardPlayer } from '@/types/games';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { LeaderboardPlayer, Board } from "@/utils/types";
 
 interface GameState {
   id: number;
   name: string;
-  points: number;
-  board: string[];
+  round: number;
+  boards: Board[];
   seconds: number;
   color: string;
   leaderboard: LeaderboardPlayer[];
@@ -14,45 +14,50 @@ interface GameState {
 const initialState: GameState = {
   id: 0,
   name: "",
-  points: 0,
-  board: [],
+  round: 0,
+  boards: [],
   seconds: 5,
-  color: "", 
-  leaderboard: []
-}
+  color: "",
+  leaderboard: [],
+};
 
 export const gameStateSlice = createSlice({
-  name: 'gameState',
+  name: "gameState",
   initialState,
   reducers: {
     setID: (state, action: PayloadAction<number>) => {
-      state.id = action.payload
+      state.id = action.payload;
     },
     setName: (state, action: PayloadAction<string>) => {
-      state.name = action.payload
-    },
-    setSeconds: (state, action: PayloadAction<number>) => {
-      state.seconds = action.payload
+      state.name = action.payload;
     },
     reduceSeconds: (state) => {
-      state.seconds -= 1
+      state.seconds -= 1;
     },
-    setPoints: (state, action: PayloadAction<number>) => {
-      state.points = action.payload
+    setRound: (state, action: PayloadAction<number>) => {
+      state.round = action.payload;
     },
     setColor: (state, action: PayloadAction<string>) => {
-      state.color = action.payload
+      state.color = action.payload;
     },
-    setBoard: (state, action: PayloadAction<string[]>) => {
-      state.board = action.payload
+    setBoards: (state, action: PayloadAction<Board[]>) => {
+      state.boards = action.payload;
     },
     setLeaderboard: (state, action: PayloadAction<LeaderboardPlayer[]>) => {
-      state.leaderboard = action.payload
-    }
+      state.leaderboard = action.payload;
+    },
   },
-})
+});
 
 // Action creators are generated for each case reducer function
-export const { setID, setName, setPoints, setBoard, reduceSeconds, setSeconds, setColor, setLeaderboard } = gameStateSlice.actions
+export const {
+  setID,
+  setName,
+  setRound,
+  setBoards,
+  reduceSeconds,
+  setColor,
+  setLeaderboard,
+} = gameStateSlice.actions;
 
-export default gameStateSlice.reducer
+export default gameStateSlice.reducer;

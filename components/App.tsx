@@ -3,18 +3,18 @@ import Game from "@/components/Game";
 import Score from "@/components/Score";
 
 import { useAppSelector, useAppDispatch } from "@/app/hooks";
-import { setID, setColor, setBoard } from "@/app/features/gameStateSlice";
-import { SSR_Data } from "@/pages/index";
+import { setID, setColor, setBoards } from "@/app/features/gameStateSlice";
+import { InitialState } from "@/utils/types";
 
 import { useEffect } from "react";
 
-const App: React.FC<SSR_Data> = (props: SSR_Data) => {
+const App: React.FC<InitialState> = (props: InitialState) => {
   //set inital store data
   const dispatch = useAppDispatch();
   useEffect(() => {
-    dispatch(setID(props.init.id));
-    dispatch(setColor(props.init.color));
-    dispatch(setBoard(props.init.board));
+    dispatch(setID(props.id));
+    dispatch(setColor(props.color));
+    dispatch(setBoards(props.boards));
   });
 
   //read game data from store
