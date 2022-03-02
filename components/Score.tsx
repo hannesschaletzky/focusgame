@@ -18,7 +18,7 @@ const Score = () => {
       <br />
       {leaderboard.map((player, i) => (
         <div
-          className="flex gap-3 w-80 items-center"
+          className="flex lg:mt-1 gap-3 w-80 items-center"
           key={i}
           title={player.created_at}
         >

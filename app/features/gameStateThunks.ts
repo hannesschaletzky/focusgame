@@ -66,6 +66,7 @@ export const getLeaderboard =
     const data: LeaderboardPlayer[] = await res.json();
     console.log("Leaderboard received");
     dispatch(setLeaderboard(data as LeaderboardPlayer[]));
+    // show loading gif for a bit :)
     setTimeout(() => dispatch(showLeaderboard()), 1000);
     //dispatch(showLeaderboard());
   };

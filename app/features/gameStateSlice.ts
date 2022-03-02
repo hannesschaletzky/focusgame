@@ -16,7 +16,7 @@ const initialState: GameState = {
   name: "",
   round: 0,
   boards: [],
-  seconds: 2,
+  seconds: 5,
   color: "",
   leaderboard: [],
 };
