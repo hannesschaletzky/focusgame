@@ -42,13 +42,15 @@ export const finishGame =
     const state = getState();
     const name = state.gameState.name;
     const gameID = state.gameState.id;
+    const rounds = state.gameState.round;
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/finish`, {
       method: "POST",
+      mode: "cors", // no-cors, *cors, same-origin
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: `id=${gameID}&name=${name}`,
+      body: `id=${gameID}&name=${name}&rounds=${rounds}`,
     });
     const data = await res.json();
     console.log(data);
@@ -59,7 +61,6 @@ export const getLeaderboard =
   (): ThunkAction<void, RootState, unknown, AnyAction> => async (dispatch) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/leaderboard`, {
       method: "GET",
-      //mode: 'no-cors', // no-cors, *cors, same-origin
     });
     const data: LeaderboardPlayer[] = await res.json();
     console.log("Leaderboard received");

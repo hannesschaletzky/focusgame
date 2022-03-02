@@ -2,7 +2,7 @@ import { col_transp, colors } from "@/utils/constants";
 import { Board } from "@/utils/types";
 
 // returns a number between 0 and (max - 1)
-const getRndNum = (max: number) => {
+export const getRndNum = (max: number) => {
   return Math.floor(Math.random() * max);
 };
 
@@ -31,6 +31,5 @@ export const constructBoard = (color: string): Board => {
   return {
     board: board,
     sol_index: index,
-    sol_color: color,
   };
 };

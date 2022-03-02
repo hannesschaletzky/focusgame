@@ -7,22 +7,33 @@ import { Provider } from "react-redux";
 
 import App from "@/components/App";
 import { Board, InitialState } from "@/utils/types";
-import { constructBoard } from "@/utils/board";
+import { constructBoard, getRndNum } from "@/utils/board";
+import { colors } from "@/utils/constants";
 
 // SSR only working on pages, not on components
 export const getServerSideProps = async () => {
-  // const res_init = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/init`);
-  // const data_init: InitData = await res_init.json();
+  // randomize color
+  let color = colors[getRndNum(colors.length - 1)];
 
-  let color = "black";
+  // construct board
   let boards: Board[] = [];
-
-  while (boards.length < 10) {
+  while (boards.length < 100) {
     boards.push(constructBoard(color));
   }
 
+  // init game on server
+  const res = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/init`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: `color=${color}`,
+  });
+  const json = await res.json();
+  console.log(json);
+
   const data: InitialState = {
-    id: 1,
+    id: json.id || null,
     color: color,
     boards: boards,
   };
@@ -37,13 +48,22 @@ export const getServerSideProps = async () => {
 const Home = ({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  console.log(data);
-
   return (
     <>
       <Head>
-        <title>Focus</title>
+        <title>Focus Game</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <meta
+          name="Focus Game 🔥"
+          content="Practice your focus by clicking as fast and precise as you can."
+        />
+        <meta name="keywords" content="Game, Focus, Concentration" />
+        <meta property="og:title" content="Focus Game 🔥" />
+        <meta
+          property="og:description"
+          content="Practice your focus by clicking as fast and precise as you can."
+        />
+        <meta property="og:type" content="website" />
       </Head>
       <Provider store={store}>
         <App {...data} />
