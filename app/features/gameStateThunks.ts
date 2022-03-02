@@ -2,7 +2,7 @@ import { AnyAction } from "redux";
 import { ThunkAction } from "redux-thunk";
 import { reduceSeconds, setLeaderboard } from "./gameStateSlice";
 import { setRound } from "@/app/features/gameStateSlice";
-import { showLeaderboard } from "@/app/features/pageSlice";
+import { showLeaderboard, next } from "@/app/features/pageSlice";
 import { RootState } from "../store";
 
 import { LeaderboardPlayer } from "@/utils/types";
@@ -19,6 +19,7 @@ export const thunkStartTimer =
     }, 1000);
     setTimeout(() => {
       clearInterval(ID);
+      dispatch(next());
       dispatch(finishGame());
     }, seconds * 1000);
   };
@@ -65,5 +66,6 @@ export const getLeaderboard =
     const data: LeaderboardPlayer[] = await res.json();
     console.log("Leaderboard received");
     dispatch(setLeaderboard(data as LeaderboardPlayer[]));
-    dispatch(showLeaderboard());
+    setTimeout(() => dispatch(showLeaderboard()), 1000);
+    //dispatch(showLeaderboard());
   };

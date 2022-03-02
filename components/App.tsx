@@ -1,6 +1,7 @@
 import Start from "@/components/Start";
 import Game from "@/components/Game";
 import Score from "@/components/Score";
+import Calculating from "@/components/Calculating";
 
 import { useAppSelector, useAppDispatch } from "@/app/hooks";
 import { setID, setColor, setBoards } from "@/app/features/gameStateSlice";
@@ -30,6 +31,9 @@ const App: React.FC<InitialState> = (props: InitialState) => {
       content = <Game />;
       break;
     case 2:
+      content = <Calculating />;
+      break;
+    case 3:
       content = <Score />;
       break;
   }

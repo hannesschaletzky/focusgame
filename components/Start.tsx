@@ -64,7 +64,10 @@ function Start() {
       <br />
 
       {/* Footer */}
-      <em className="fixed bottom-4" onClick={() => dispatch(getLeaderboard())}>
+      <em
+        className="fixed bottom-4 cursor-pointer"
+        onClick={() => dispatch(getLeaderboard())}
+      >
         Leaderboard
       </em>
     </div>
