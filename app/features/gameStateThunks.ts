@@ -4,6 +4,7 @@ import { reduceSeconds, setLeaderboard } from "./gameStateSlice";
 import { setRound } from "@/app/features/gameStateSlice";
 import { showLeaderboard, next } from "@/app/features/pageSlice";
 import { RootState } from "../store";
+import CryptoJS from "crypto-js";
 
 import { LeaderboardPlayer } from "@/utils/types";
 
@@ -45,13 +46,23 @@ export const finishGame =
     const gameID = state.gameState.id;
     const rounds = state.gameState.round;
 
+    // encrypt rounds
+    const passphrase = process.env.NEXT_PUBLIC_PASSPHRASE!;
+    const cipherRounds = CryptoJS.AES.encrypt(
+      rounds.toString(),
+      passphrase
+    ).toString();
+    console.log(cipherRounds);
+
     const res = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/finish`, {
       method: "POST",
       mode: "cors", // no-cors, *cors, same-origin
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: `id=${gameID}&name=${name}&rounds=${rounds}`,
+      body: `id=${gameID}&name=${name}&rounds=${encodeURIComponent(
+        cipherRounds
+      )}`,
     });
     const data = await res.json();
     console.log(data);
