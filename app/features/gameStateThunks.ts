@@ -48,11 +48,16 @@ export const finishGame =
 
     // encrypt rounds
     const passphrase = process.env.NEXT_PUBLIC_PASSPHRASE!;
-    const cipherRounds = CryptoJS.AES.encrypt(
-      rounds.toString(),
-      passphrase
-    ).toString();
-    console.log(cipherRounds);
+    let cipherRounds = "";
+    try {
+      cipherRounds = CryptoJS.AES.encrypt(
+        rounds.toString(),
+        passphrase
+      ).toString();
+    } catch (err) {
+      console.log("could not encrpt: " + err);
+      throw err;
+    }
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/finish`, {
       method: "POST",
