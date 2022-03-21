@@ -21,22 +21,51 @@ export const getServerSideProps = async () => {
     boards.push(constructBoard(color));
   }
 
-  // init game on server
-  const res = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/init`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: `color=${color}`,
-  });
-  const json = await res.json();
-  console.log(json);
+  function timeout(ms = 5000, promise: Promise<Response>): Promise<Response> {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(new Error("Server down"));
+      }, ms);
 
-  const data: InitialState = {
-    id: json.id || null,
+      promise
+        .then((value) => {
+          clearTimeout(timer);
+          resolve(value);
+        })
+        .catch((reason) => {
+          clearTimeout(timer);
+          reject(reason);
+        });
+    });
+  }
+
+  let data: InitialState = {
+    booting: true,
+    id: -1,
     color: color,
     boards: boards,
   };
+
+  // server is up when no timeout error was thrown
+  try {
+    await timeout(2000, fetch(`${process.env.NEXT_PUBLIC_DBHOST}`));
+    // init game on server
+    const res = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/init`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `color=${color}`,
+    });
+    const json = await res.json();
+    console.log(json);
+
+    data.booting = false;
+    data.id = json.id;
+  } catch (err) {
+    // server down/booting
+    console.log(err);
+  }
 
   return {
     props: {

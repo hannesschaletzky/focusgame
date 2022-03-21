@@ -2,6 +2,7 @@ import Start from "@/components/Start";
 import Game from "@/components/Game";
 import Score from "@/components/Score";
 import Calculating from "@/components/Calculating";
+import Router from "next/router";
 
 import { useAppSelector, useAppDispatch } from "@/app/hooks";
 import { setID, setColor, setBoards } from "@/app/features/gameStateSlice";
@@ -23,6 +24,17 @@ const App: React.FC<InitialState> = (props: InitialState) => {
 
   //determine content based on state
   let content: JSX.Element = <div></div>;
+
+  // refresh page until server is booted
+  if (props.booting) {
+    setTimeout(() => Router.reload(), 2000);
+    return (
+      <div>
+        Server is booting, site reloads automatically until server is up!
+      </div>
+    );
+  }
+
   switch (index) {
     case 0:
       content = <Start />;
