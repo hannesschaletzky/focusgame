@@ -2,7 +2,6 @@ export interface InitialState {
   booting: boolean;
   id: number;
   color: string;
-  boards: Board[];
 }
 
 export interface LeaderboardPlayer {

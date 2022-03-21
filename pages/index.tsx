@@ -6,20 +6,14 @@ import { store } from "@/app/store";
 import { Provider } from "react-redux";
 
 import App from "@/components/App";
-import { Board, InitialState } from "@/utils/types";
-import { constructBoard, getRndNum } from "@/utils/board";
+import { InitialState } from "@/utils/types";
+import { getRndNum } from "@/utils/board";
 import { colors } from "@/utils/constants";
 
 // SSR only working on pages, not on components
 export const getServerSideProps = async () => {
   // randomize color
   let color = colors[getRndNum(colors.length - 1)];
-
-  // construct board
-  let boards: Board[] = [];
-  while (boards.length < 100) {
-    boards.push(constructBoard(color));
-  }
 
   function timeout(ms = 5000, promise: Promise<Response>): Promise<Response> {
     return new Promise((resolve, reject) => {
@@ -43,7 +37,6 @@ export const getServerSideProps = async () => {
     booting: true,
     id: -1,
     color: color,
-    boards: boards,
   };
 
   // server is up when no timeout error was thrown
@@ -60,8 +53,10 @@ export const getServerSideProps = async () => {
     const json = await res.json();
     console.log(json);
 
-    data.booting = false;
-    data.id = json.id;
+    if (json.id) {
+      data.booting = false;
+      data.id = json.id;
+    }
   } catch (err) {
     // server down/booting
     console.log(err);
