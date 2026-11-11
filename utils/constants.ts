@@ -23,3 +23,7 @@ export const randomColor = (): Color =>
 
 export const isColor = (value: unknown): value is Color =>
   typeof value === "string" && (COLORS as readonly string[]).includes(value);
+
+// Auf hellen Spielfarben braucht Text Schwarz, sonst Weiß
+const LIGHT_COLORS: readonly string[] = ["lightgray", "yellow", "aqua", "coral"];
+export const textOn = (color: string) => (LIGHT_COLORS.includes(color) ? "black" : "white");

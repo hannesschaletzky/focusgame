@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { useEffect } from "react";
 import { StartButton } from "@/styles/UI_Elements";
-import { COLORS, GAME_SECONDS, NAME_MAX_LENGTH, TRANSPARENT } from "@/utils/constants";
+import { COLORS, GAME_SECONDS, NAME_MAX_LENGTH, TRANSPARENT, textOn } from "@/utils/constants";
 
 interface Props {
   color: string;
@@ -64,24 +64,36 @@ const Start = ({ color, name, onName, onStart, onLeaderboard, starting, error }:
         <div>
           <h1 className="text-6xl font-black leading-none">Focus</h1>
           <p className="mt-4">
-            Click as many <strong>{color}</strong> squares as you can in {GAME_SECONDS} seconds.
+            Tap every square in this color. You have {GAME_SECONDS}&nbsp;seconds.
           </p>
         </div>
 
+        {/* Die Zielfarbe ist das Auffälligste auf der Seite */}
+        <div
+          className="flex h-16 items-center justify-between border-2 border-black px-4 text-lg"
+          style={{ backgroundColor: color, color: textOn(color) }}
+        >
+          <span>Your color</span>
+          <strong>{color}</strong>
+        </div>
+
         {/* Beispielfeld */}
-        <div className="grid grid-cols-5 border-2 border-black" aria-hidden="true">
-          {previewCells(color).map((c, i) => (
-            <div
-              key={i}
-              className="h-7"
-              style={{
-                backgroundColor: c,
-                // Das gesuchte Feld markieren
-                outline: i === TARGET_CELL ? "3px solid black" : undefined,
-                outlineOffset: -3,
-              }}
-            />
-          ))}
+        <div>
+          <div className="mb-2 text-sm">It hides among other colors:</div>
+          <div className="grid grid-cols-5 border-2 border-black" aria-hidden="true">
+            {previewCells(color).map((c, i) => (
+              <div
+                key={i}
+                className="h-7"
+                style={{
+                  backgroundColor: c,
+                  // Das gesuchte Feld markieren
+                  outline: i === TARGET_CELL ? "3px solid black" : undefined,
+                  outlineOffset: -3,
+                }}
+              />
+            ))}
+          </div>
         </div>
 
         <form
