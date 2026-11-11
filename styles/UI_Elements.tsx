@@ -49,14 +49,6 @@ export const Points = styled(Overlay)`
   top: 40%;
   font-size: 10rem;
   opacity: 0.2;
-  animation: points-pop 250ms ease-out;
-
-  @keyframes points-pop {
-    from {
-      transform: scale(1.5);
-      opacity: 0.5;
-    }
-  }
 `;
 
 // Kurzes rotes Aufblinken nach einem Fehlklick
