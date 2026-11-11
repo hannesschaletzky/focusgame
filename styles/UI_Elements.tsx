@@ -42,13 +42,6 @@ export const Cell = styled.div<{ $color: string }>`
   user-select: none;
 `;
 
-export const Swatch = styled.div<{ $color: string; $size?: number }>`
-  width: ${({ $size = 24 }) => $size * 2.5}px;
-  height: ${({ $size = 24 }) => $size}px;
-  flex-shrink: 0;
-  background-color: ${({ $color }) => $color};
-`;
-
 const Overlay = styled.div`
   position: absolute;
   left: 0;

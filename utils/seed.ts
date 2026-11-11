@@ -1,13 +1,13 @@
-// Bestenliste aus der alten SQL-Server-Datenbank (focus_SQLServer/leaders.json)
-export const LEGACY_LEADERS = [
-  { name: "Sandra", rounds: 8, date: "2021-12-28T00:43:08.803Z", color: "black" },
-  { name: "kevkev", rounds: 7, date: "2022-02-28T21:26:05.296Z", color: "green" },
-  { name: "Sandra", rounds: 7, date: "2021-12-28T00:47:21.926Z", color: "coral" },
-  { name: "Hannes", rounds: 7, date: "2021-12-17T20:32:10.212Z", color: "yellow" },
-  { name: "Christoph", rounds: 7, date: "2021-12-16T07:49:58.707Z", color: "green" },
-  { name: "kevkev", rounds: 6, date: "2022-02-28T21:27:01.161Z", color: "aqua" },
-  { name: "Olli", rounds: 6, date: "2021-12-31T17:17:41.356Z", color: "red" },
-  { name: "Rybcia", rounds: 6, date: "2021-12-28T20:44:10.181Z", color: "green" },
-  { name: "Sandra", rounds: 6, date: "2021-12-28T00:50:57.488Z", color: "blue" },
-  { name: "GG", rounds: 6, date: "2021-12-27T21:17:07.376Z", color: "yellow" },
+// Testeinträge für eine frische Bestenliste (höchster Wert 5)
+export const TEST_LEADERS = [
+  { name: "Homer", rounds: 5, date: "2026-11-02T19:12:00.000Z", color: "yellow" },
+  { name: "Lisa", rounds: 5, date: "2026-11-04T17:40:00.000Z", color: "red" },
+  { name: "Marge", rounds: 4, date: "2026-11-03T20:05:00.000Z", color: "blue" },
+  { name: "Bart", rounds: 4, date: "2026-11-06T15:22:00.000Z", color: "coral" },
+  { name: "Moe", rounds: 4, date: "2026-11-08T22:47:00.000Z", color: "black" },
+  { name: "Ned", rounds: 3, date: "2026-11-05T08:30:00.000Z", color: "green" },
+  { name: "Milhouse", rounds: 3, date: "2026-11-07T16:10:00.000Z", color: "aqua" },
+  { name: "Apu", rounds: 2, date: "2026-11-09T12:55:00.000Z", color: "purple" },
+  { name: "Krusty", rounds: 2, date: "2026-11-10T18:18:00.000Z", color: "lightgray" },
+  { name: "Maggie", rounds: 1, date: "2026-11-11T09:01:00.000Z", color: "green" },
 ];

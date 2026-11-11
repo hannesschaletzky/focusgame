@@ -6,3 +6,28 @@ body {
   height: 100%;
   overflow: hidden;
 }
+
+/* Ladebildschirm: Punkte tippen sich nacheinander ein, Balken füllt sich über die Mindestdauer */
+.loading-dots {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  width: 0;
+  animation: loading-dots 1.2s steps(4, jump-none) infinite;
+}
+@keyframes loading-dots {
+  to {
+    width: 1.2em;
+  }
+}
+.loading-bar {
+  width: 0;
+  animation-name: loading-bar;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+@keyframes loading-bar {
+  to {
+    width: 100%;
+  }
+}

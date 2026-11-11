@@ -23,6 +23,8 @@ const Home = ({ color }: InferGetServerSidePropsType<typeof getServerSideProps>)
         content="Practice your focus by clicking as fast and precise as you can."
       />
       <meta property="og:type" content="website" />
+      {/* Homer soll sofort da sein, wenn das Spiel endet */}
+      <link rel="preload" as="image" href="/loading.gif" />
     </Head>
     <App initialColor={color} />
   </>
