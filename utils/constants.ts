@@ -6,7 +6,7 @@ export const COLORS = [
   "green",
   "yellow",
   "blue",
-  "coral",
+  "hotpink",
   "aqua",
 ] as const;
 export type Color = (typeof COLORS)[number];
@@ -25,5 +25,5 @@ export const isColor = (value: unknown): value is Color =>
   typeof value === "string" && (COLORS as readonly string[]).includes(value);
 
 // Auf hellen Spielfarben braucht Text Schwarz, sonst Weiß
-const LIGHT_COLORS: readonly string[] = ["lightgray", "yellow", "aqua", "coral"];
+const LIGHT_COLORS: readonly string[] = ["lightgray", "yellow", "aqua", "coral", "hotpink"];
 export const textOn = (color: string) => (LIGHT_COLORS.includes(color) ? "black" : "white");

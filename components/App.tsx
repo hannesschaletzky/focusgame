@@ -44,11 +44,14 @@ const App = ({ initialColor }: { initialColor: Color }) => {
     }
   };
 
+  // Gibt zurück, ob getroffen wurde; das Spielfeld zeigt danach Treffer oder Fehler an
   const click = (index: number) => {
-    if (!game) return;
+    if (!game) return false;
     clicks.current.push(index);
     const board = game.boards[Math.min(round, game.boards.length - 1)];
-    if (board[index] === color) setRound((r) => r + 1);
+    const hit = board[index] === color;
+    if (hit) setRound((r) => r + 1);
+    return hit;
   };
 
   // Ladeanimation mindestens kurz zeigen, dann Bestenliste

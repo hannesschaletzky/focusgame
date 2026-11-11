@@ -64,7 +64,7 @@ const Start = ({ color, name, onName, onStart, onLeaderboard, starting, error }:
         <div>
           <h1 className="text-6xl font-black leading-none">Focus</h1>
           <p className="mt-4">
-            Tap every square in this color. You have {GAME_SECONDS}&nbsp;seconds.
+            Tap every square in this color. You have {GAME_SECONDS}&nbsp;seconds, and wrong taps cost you time.
           </p>
         </div>
 

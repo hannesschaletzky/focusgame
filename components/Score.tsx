@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { StartButton } from "@/styles/UI_Elements";
 import type { LeaderboardEntry } from "@/utils/types";
 
@@ -28,7 +29,25 @@ const headline = (score: number, myRank: number, leaders: LeaderboardEntry[]) =>
 };
 
 const Score = ({ score, name, leaders, error, onRestart }: Props) => {
+  const [copied, setCopied] = useState(false);
   const me = name.toLowerCase();
+
+  // Am Handy das Teilen-Menü, sonst Text + Link in die Zwischenablage
+  const share = async () => {
+    const text = `I scored ${score} in Focus. Can you beat that?`;
+    const url = window.location.origin;
+    try {
+      if (navigator.share) {
+        await navigator.share({ text, url });
+        return;
+      }
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Teilen abgebrochen oder Zwischenablage nicht erlaubt
+    }
+  };
   const myRank = me ? leaders.findIndex((p) => p.name.toLowerCase() === me) : -1;
 
   return (
@@ -86,8 +105,13 @@ const Score = ({ score, name, leaders, error, onRestart }: Props) => {
           </ol>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex items-center justify-center gap-6">
           <StartButton onClick={onRestart}>{score !== null ? "Play again" : "Let's go!"}</StartButton>
+          {score !== null && score > 0 && (
+            <button className="underline underline-offset-4" onClick={share}>
+              {copied ? "Copied!" : "Share"}
+            </button>
+          )}
         </div>
       </div>
     </div>

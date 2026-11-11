@@ -1,16 +1,21 @@
-import { useEffect, useEffectEvent, useState } from "react";
-import { Cell, Points, Seconds } from "@/styles/UI_Elements";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { Cell, MissFlash, Points, Seconds } from "@/styles/UI_Elements";
 import { GAME_SECONDS } from "@/utils/constants";
 
 interface Props {
   boards: string[][];
   round: number;
-  onClick: (index: number) => void;
+  onClick: (index: number) => boolean;
   onTimeUp: () => void;
 }
 
+// So lange ist das Feld nach einem Fehlklick gesperrt: Raten kostet Zeit
+const MISS_LOCK_MS = 300;
+
 const Game = ({ boards, round, onClick, onTimeUp }: Props) => {
   const [seconds, setSeconds] = useState(GAME_SECONDS);
+  const [missCount, setMissCount] = useState(0);
+  const lockedUntil = useRef(0);
   const timeUp = useEffectEvent(onTimeUp);
 
   // Restzeit aus der Uhr berechnen statt Intervalle zu zählen, damit nichts driftet
@@ -28,13 +33,24 @@ const Game = ({ boards, round, onClick, onTimeUp }: Props) => {
     return () => clearInterval(id);
   }, []);
 
+  // at = Zeitstempel des Pointer-Events; Ref statt State, damit auch sehr schnelle Klicks gesperrt sind
+  const tap = (index: number, at: number) => {
+    if (at < lockedUntil.current) return;
+    if (!onClick(index)) {
+      lockedUntil.current = at + MISS_LOCK_MS;
+      setMissCount((n) => n + 1);
+    }
+  };
+
   const board = boards[Math.min(round, boards.length - 1)];
 
   return (
     <div className="fixed inset-0 flex flex-wrap">
-      <Points>{round}</Points>
+      {/* key startet die Animationen bei jedem Treffer bzw. Fehler neu */}
+      <Points key={`p${round}`}>{round}</Points>
+      {missCount > 0 && <MissFlash key={`m${missCount}`} $ms={MISS_LOCK_MS} />}
       {board.map((color, i) => (
-        <Cell $color={color} key={i} onPointerDown={() => onClick(i)} />
+        <Cell $color={color} key={i} onPointerDown={(e) => tap(i, e.timeStamp)} />
       ))}
       <Seconds>{seconds}</Seconds>
     </div>

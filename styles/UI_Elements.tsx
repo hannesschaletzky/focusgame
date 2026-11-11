@@ -49,6 +49,33 @@ export const Points = styled(Overlay)`
   top: 40%;
   font-size: 10rem;
   opacity: 0.2;
+  animation: points-pop 250ms ease-out;
+
+  @keyframes points-pop {
+    from {
+      transform: scale(1.5);
+      opacity: 0.5;
+    }
+  }
+`;
+
+// Kurzes rotes Aufblinken nach einem Fehlklick
+export const MissFlash = styled.div<{ $ms: number }>`
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-color: red;
+  animation: miss-flash ${({ $ms }) => $ms}ms ease-out forwards;
+
+  @keyframes miss-flash {
+    from {
+      opacity: 0.35;
+    }
+    to {
+      opacity: 0;
+    }
+  }
 `;
 
 export const Seconds = styled(Overlay)`
