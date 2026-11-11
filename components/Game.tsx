@@ -1,27 +1,40 @@
-import { Item } from "@/styles/UI_Elements";
-import { useAppSelector, useAppDispatch } from "@/app/hooks";
+import { useEffect, useEffectEvent, useState } from "react";
+import { Cell, Points, Seconds } from "@/styles/UI_Elements";
+import { GAME_SECONDS } from "@/utils/constants";
 
-import { Points, Seconds } from "@/styles/UI_Elements";
+interface Props {
+  boards: string[][];
+  round: number;
+  onClick: (index: number) => void;
+  onTimeUp: () => void;
+}
 
-import { thunkCheckClick } from "@/app/features/gameStateThunks";
+const Game = ({ boards, round, onClick, onTimeUp }: Props) => {
+  const [seconds, setSeconds] = useState(GAME_SECONDS);
+  const timeUp = useEffectEvent(onTimeUp);
 
-const Game: React.FC = () => {
-  const dispatch = useAppDispatch();
+  // Restzeit aus der Uhr berechnen statt Intervalle zu zählen, damit nichts driftet
+  useEffect(() => {
+    const startedAt = Date.now();
+    const id = setInterval(() => {
+      const left = GAME_SECONDS - (Date.now() - startedAt) / 1000;
+      if (left <= 0) {
+        clearInterval(id);
+        timeUp();
+      } else {
+        setSeconds(Math.ceil(left));
+      }
+    }, 100);
+    return () => clearInterval(id);
+  }, []);
 
-  const round = useAppSelector((state) => state.gameState.round);
-  const seconds = useAppSelector((state) => state.gameState.seconds);
-  const board = useAppSelector((state) => state.gameState.boards[round]);
+  const board = boards[Math.min(round, boards.length - 1)];
 
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-wrap">
+    <div className="fixed inset-0 flex flex-wrap">
       <Points>{round}</Points>
-      {board.board.map((color, i) => (
-        <Item
-          color={color}
-          height={"100% / 20"}
-          onClick={() => dispatch(thunkCheckClick(i))}
-          key={i}
-        />
+      {board.map((color, i) => (
+        <Cell $color={color} key={i} onPointerDown={() => onClick(i)} />
       ))}
       <Seconds>{seconds}</Seconds>
     </div>

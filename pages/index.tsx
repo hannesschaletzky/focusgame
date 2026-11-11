@@ -1,99 +1,31 @@
 import Head from "next/head";
-// SSR
-import { InferGetServerSidePropsType } from "next";
-// redux
-import { store } from "@/app/store";
-import { Provider } from "react-redux";
-
+import type { InferGetServerSidePropsType } from "next";
 import App from "@/components/App";
-import { InitialState } from "@/utils/types";
-import { getRndNum } from "@/utils/board";
-import { colors } from "@/utils/constants";
+import { randomColor } from "@/utils/constants";
 
-// SSR only working on pages, not on components
-export const getServerSideProps = async () => {
-  // randomize color
-  let color = colors[getRndNum(colors.length - 1)];
+// Farbe auf dem Server würfeln, damit Server- und Client-Render übereinstimmen
+export const getServerSideProps = async () => ({
+  props: { color: randomColor() },
+});
 
-  function timeout(ms = 5000, promise: Promise<Response>): Promise<Response> {
-    return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        reject(new Error("Server down"));
-      }, ms);
-
-      promise
-        .then((value) => {
-          clearTimeout(timer);
-          resolve(value);
-        })
-        .catch((reason) => {
-          clearTimeout(timer);
-          reject(reason);
-        });
-    });
-  }
-
-  let data: InitialState = {
-    booting: true,
-    id: -1,
-    color: color,
-  };
-
-  // server is up when no timeout error was thrown
-  try {
-    await timeout(2000, fetch(`${process.env.NEXT_PUBLIC_DBHOST}`));
-    // init game on server
-    const res = await fetch(`${process.env.NEXT_PUBLIC_DBHOST}/init`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: `color=${color}`,
-    });
-    const json = await res.json();
-    console.log(json);
-
-    if (json.id) {
-      data.booting = false;
-      data.id = json.id;
-    }
-  } catch (err) {
-    // server down/booting
-    console.log(err);
-  }
-
-  return {
-    props: {
-      data,
-    },
-  };
-};
-
-const Home = ({
-  data,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  return (
-    <>
-      <Head>
-        <title>Focus Game</title>
-        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-        <meta
-          name="Focus Game 🔥"
-          content="Practice your focus by clicking as fast and precise as you can."
-        />
-        <meta name="keywords" content="Game, Focus, Concentration" />
-        <meta property="og:title" content="Focus Game 🔥" />
-        <meta
-          property="og:description"
-          content="Practice your focus by clicking as fast and precise as you can."
-        />
-        <meta property="og:type" content="website" />
-      </Head>
-      <Provider store={store}>
-        <App {...data} />
-      </Provider>
-    </>
-  );
-};
+const Home = ({ color }: InferGetServerSidePropsType<typeof getServerSideProps>) => (
+  <>
+    <Head>
+      <title>Focus Game</title>
+      <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      <meta
+        name="description"
+        content="Practice your focus by clicking as fast and precise as you can."
+      />
+      <meta property="og:title" content="Focus Game 🔥" />
+      <meta
+        property="og:description"
+        content="Practice your focus by clicking as fast and precise as you can."
+      />
+      <meta property="og:type" content="website" />
+    </Head>
+    <App initialColor={color} />
+  </>
+);
 
 export default Home;

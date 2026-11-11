@@ -1,77 +1,76 @@
 import Image from "next/image";
-import { useAppDispatch, useAppSelector } from "@/app/hooks";
-import { next, showLeaderboard } from "@/app/features/pageSlice";
 import { useEffect } from "react";
-import {
-  thunkStartTimer,
-  getLeaderboard,
-} from "@/app/features/gameStateThunks";
-import { Input, Item, StartButton } from "@/styles/UI_Elements";
-import { setName } from "@/app/features/gameStateSlice";
+import { Cell, Input, StartButton } from "@/styles/UI_Elements";
+import { NAME_MAX_LENGTH } from "@/utils/constants";
 
-function Start() {
-  const dispatch = useAppDispatch();
-  const color = useAppSelector((state) => state.gameState.color);
-  const name = useAppSelector((state) => state.gameState.name);
+interface Props {
+  color: string;
+  name: string;
+  onName: (name: string) => void;
+  onStart: () => void;
+  onLeaderboard: () => void;
+  starting: boolean;
+  error: string;
+}
 
-  // check saved name from local storage
+const STORAGE_KEY = "name";
+
+const Start = ({ color, name, onName, onStart, onLeaderboard, starting, error }: Props) => {
+  // Gespeicherten Namen einmalig übernehmen
   useEffect(() => {
-    const name = localStorage.getItem("name");
-    if (name) {
-      dispatch(setName(name));
-    }
-  });
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) onName(saved);
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const inputChanged = (name: string) => {
-    localStorage.setItem("name", name);
-    dispatch(setName(name));
-  };
-
-  const start = () => {
-    dispatch(next());
-    dispatch(thunkStartTimer());
+  const changeName = (value: string) => {
+    const trimmed = value.trim();
+    try {
+      localStorage.setItem(STORAGE_KEY, trimmed);
+    } catch {}
+    onName(trimmed);
   };
 
   return (
-    <div className="fixed top-0 left-0 bottom-0 right-0 flex flex-col justify-center items-center flex-wrap">
-      {/* GitHub Icon */}
+    <div className="fixed inset-0 flex flex-col justify-center items-center gap-2 p-4 text-center">
       <a
         href="https://github.com/hannesschaletzky/focusgame"
         target="_blank"
         rel="noopener noreferrer"
+        className="fixed top-5 right-5"
       >
-        <div className="fixed top-5 right-5">
-          <Image src="/github.png" alt="GitHub" width={40} height={40} />
-        </div>
+        <Image src="/github.png" alt="GitHub" width={40} height={40} />
       </a>
 
-      {/* Content */}
       <div>Click as many {color} squares as you can...</div>
       <div>They look like this:</div>
-      <Item color={color} height={"100% / 20"} />
+      {/* So groß wie ein Feld im Spiel */}
+      <Cell $color={color} style={{ width: "20vw", height: "5vh" }} />
       <br />
-      {name.length == 0 && <div>Enter a name to start</div>}
+      {name.length === 0 && <div>Enter a name to start</div>}
       <Input
         type="text"
-        maxLength={12}
+        maxLength={NAME_MAX_LENGTH}
         value={name}
-        onChange={(e) => inputChanged(e.target.value.trim())}
+        aria-label="Name"
+        onChange={(e) => changeName(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && name && !starting && onStart()}
       />
       <br />
       {name.length > 0 && (
-        <StartButton onClick={() => start()}>Start</StartButton>
+        <StartButton onClick={onStart} disabled={starting}>
+          {starting ? "..." : "Start"}
+        </StartButton>
       )}
-      <br />
+      {error && <div className="text-red-600">{error}</div>}
 
-      {/* Footer */}
-      <em
-        className="fixed bottom-4 cursor-pointer"
-        onClick={() => dispatch(getLeaderboard())}
-      >
+      <button className="fixed bottom-4 italic cursor-pointer" onClick={onLeaderboard}>
         Leaderboard
-      </em>
+      </button>
     </div>
   );
-}
+};
 
 export default Start;

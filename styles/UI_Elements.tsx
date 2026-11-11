@@ -5,26 +5,13 @@ export const Input = styled.input`
   padding: 1rem;
   border-radius: 8px;
   outline: none;
+  text-align: center;
 `;
 
-export const Button = styled.a`
-  margin-top: 1rem;
-  padding: 1rem;
-  background-color: #1e911e;
-  color: white;
-  box-shadow: 2px 2px darkgray;
-  border-radius: 8px;
-  cursor: pointer;
-
-  &:active {
-    box-shadow: none;
-  }
-`;
-
-/* START */
-export const StartButton = styled.div`
+export const StartButton = styled.button`
   height: 50px;
-  width: 100px;
+  min-width: 100px;
+  padding: 0 1rem;
 
   display: flex;
   justify-content: center;
@@ -40,45 +27,46 @@ export const StartButton = styled.div`
   &:active {
     box-shadow: none;
   }
+  &:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
 `;
 
 /* GAME */
-interface ItemProps {
-  color: string;
-  height: string;
-}
-export const Item = styled.div<ItemProps>`
+export const Cell = styled.div<{ $color: string }>`
   width: 20%;
-  height: calc(${({ height }) => height});
-  background-color: ${({ color }) => color};
+  height: 5%;
+  background-color: ${({ $color }) => $color};
+  touch-action: manipulation;
+  user-select: none;
 `;
 
-export const Points = styled.div`
+export const Swatch = styled.div<{ $color: string; $size?: number }>`
+  width: ${({ $size = 24 }) => $size * 2.5}px;
+  height: ${({ $size = 24 }) => $size}px;
+  flex-shrink: 0;
+  background-color: ${({ $color }) => $color};
+`;
+
+const Overlay = styled.div`
   position: absolute;
-  top: 40%;
   left: 0;
   right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  //width: 10%;
   text-align: center;
+  z-index: 1;
+  pointer-events: none;
+  user-select: none;
+`;
+
+export const Points = styled(Overlay)`
+  top: 40%;
   font-size: 10rem;
   opacity: 0.2;
-  z-index: 1;
-  pointer-events: none;
 `;
 
-export const Seconds = styled.div`
-  position: absolute;
+export const Seconds = styled(Overlay)`
   bottom: 5%;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
-  //width: 10%;
-  text-align: center;
   font-size: 5rem;
   opacity: 0.1;
-  z-index: 1;
-  pointer-events: none;
 `;

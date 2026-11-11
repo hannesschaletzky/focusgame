@@ -1,17 +1,15 @@
-export interface InitialState {
-  booting: boolean;
-  id: number;
-  color: string;
-}
-
-export interface LeaderboardPlayer {
+export interface LeaderboardEntry {
   name: string;
-  created_at: string;
   rounds: number;
   color: string;
+  date: string; // ISO
 }
 
-export interface Board {
-  board: string[];
-  sol_index: number;
+export interface NewGame {
+  id: string;
+  boards: string[][]; // ohne Lösungsindex, der bleibt auf dem Server
+}
+
+export interface FinishedGame {
+  rounds: number;
 }
