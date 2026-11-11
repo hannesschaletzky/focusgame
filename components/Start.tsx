@@ -49,7 +49,7 @@ const Start = ({ color, name, onName, onStart, onLeaderboard, starting, error }:
   const canStart = name.length > 0 && !starting;
 
   return (
-    <div className="fixed inset-0 overflow-y-auto">
+    <>
       <a
         href="https://github.com/hannesschaletzky/focusgame"
         target="_blank"
@@ -60,22 +60,51 @@ const Start = ({ color, name, onName, onStart, onLeaderboard, starting, error }:
         <Image src="/github.png" alt="" width={28} height={28} />
       </a>
 
-      <div className="mx-auto flex min-h-full max-w-sm flex-col justify-center gap-8 px-4 py-16">
+      {/* Am Handy oben ausgerichtet, damit bei offener Tastatur nichts springt; ab md zentriert */}
+      <main className="mx-auto flex min-h-dvh max-w-sm flex-col gap-6 px-4 pt-14 pb-10 md:justify-center">
         <div>
-          <h1 className="text-6xl font-black leading-none">Focus</h1>
-          <p className="mt-4">
+          <h1 className="text-5xl font-black leading-none md:text-6xl">Focus</h1>
+          <p className="mt-3">
             Tap every square in this color. You have {GAME_SECONDS}&nbsp;seconds.
           </p>
         </div>
 
         {/* Die Zielfarbe ist das Auffälligste auf der Seite */}
         <div
-          className="flex h-16 items-center justify-between border-2 border-black px-4 text-lg"
+          className="flex h-14 items-center justify-between border-2 border-black px-4 text-lg"
           style={{ backgroundColor: color, color: textOn(color) }}
         >
           <span>Your color</span>
           <strong>{color}</strong>
         </div>
+
+        {/* Name und Start vor dem Beispielfeld, damit beides über der Tastatur bleibt */}
+        <form
+          className="flex flex-col gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (canStart) onStart();
+          }}
+        >
+          <label htmlFor="name" className="font-bold">
+            Your name
+          </label>
+          <input
+            id="name"
+            type="text"
+            autoComplete="nickname"
+            enterKeyHint="go"
+            maxLength={NAME_MAX_LENGTH}
+            value={name}
+            aria-label="Name"
+            onChange={(e) => changeName(e.target.value)}
+            className="h-12 border-2 border-black px-3 text-lg outline-none focus:border-orange-500"
+          />
+          <StartButton type="submit" disabled={!canStart} className="mt-2 w-full">
+            {starting ? "..." : "Start"}
+          </StartButton>
+          {error && <div className="text-red-600">{error}</div>}
+        </form>
 
         {/* Beispielfeld */}
         <div>
@@ -96,37 +125,11 @@ const Start = ({ color, name, onName, onStart, onLeaderboard, starting, error }:
           </div>
         </div>
 
-        <form
-          className="flex flex-col gap-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (canStart) onStart();
-          }}
-        >
-          <label htmlFor="name" className="font-bold">
-            Your name
-          </label>
-          <input
-            id="name"
-            type="text"
-            autoComplete="nickname"
-            maxLength={NAME_MAX_LENGTH}
-            value={name}
-            aria-label="Name"
-            onChange={(e) => changeName(e.target.value)}
-            className="h-12 border-2 border-black px-3 text-lg outline-none focus:border-orange-500"
-          />
-          <StartButton type="submit" disabled={!canStart} className="mt-2 w-full">
-            {starting ? "..." : "Start"}
-          </StartButton>
-          {error && <div className="text-red-600">{error}</div>}
-        </form>
-
         <button className="self-start underline underline-offset-4" onClick={onLeaderboard}>
           Leaderboard
         </button>
-      </div>
-    </div>
+      </main>
+    </>
   );
 };
 

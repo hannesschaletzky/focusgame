@@ -3,8 +3,11 @@
 html,
 body {
   margin: 0;
-  height: 100%;
-  overflow: hidden;
+}
+
+/* Kein Pull-to-refresh oder Nachfedern, vor allem während des Spiels */
+body {
+  overscroll-behavior: none;
 }
 
 /* Ladebildschirm: Punkte tippen sich nacheinander ein, Balken füllt sich über die Mindestdauer */

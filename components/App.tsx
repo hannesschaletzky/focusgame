@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Start from "@/components/Start";
 import Game from "@/components/Game";
 import Calculating from "@/components/Calculating";
@@ -27,6 +27,11 @@ const App = ({ initialColor }: { initialColor: Color }) => {
   const [starting, setStarting] = useState(false);
   const [loading, setLoading] = useState({ label: "", ms: MIN_LOADING_AFTER_GAME_MS });
   const clicks = useRef<number[]>([]);
+
+  // Die Seiten scrollen normal; jede neue Phase beginnt oben
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [phase]);
 
   const start = async () => {
     setError("");
