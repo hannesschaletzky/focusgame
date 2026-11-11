@@ -13,23 +13,36 @@ interface Props {
 const MISS_FLASH_MS = 300;
 
 const Game = ({ boards, round, onClick, onTimeUp }: Props) => {
-  const [seconds, setSeconds] = useState(GAME_SECONDS);
+  const [secondsLeft, setSecondsLeft] = useState(GAME_SECONDS);
   const [missCount, setMissCount] = useState(0);
   const timeUp = useEffectEvent(onTimeUp);
 
-  // Restzeit aus der Uhr berechnen statt Intervalle zu zählen, damit nichts driftet
+  // Spielende: Restzeit aus der Uhr berechnen statt Intervalle zu zählen, damit nichts driftet.
+  // setInterval läuft auch in einem Tab im Hintergrund weiter, requestAnimationFrame nicht.
+  // Anzeige: pro Frame neu, damit die Hundertstel flüssig herunterlaufen.
   useEffect(() => {
-    const startedAt = Date.now();
+    const startedAt = performance.now();
+    const leftAt = (now: number) => Math.max(0, GAME_SECONDS - (now - startedAt) / 1000);
+
+    let frame = 0;
+    const draw = (now: number) => {
+      setSecondsLeft(leftAt(now));
+      frame = requestAnimationFrame(draw);
+    };
+    frame = requestAnimationFrame(draw);
+
     const id = setInterval(() => {
-      const left = GAME_SECONDS - (Date.now() - startedAt) / 1000;
-      if (left <= 0) {
+      if (leftAt(performance.now()) <= 0) {
         clearInterval(id);
+        cancelAnimationFrame(frame);
+        setSecondsLeft(0);
         timeUp();
-      } else {
-        setSeconds(Math.ceil(left));
       }
-    }, 100);
-    return () => clearInterval(id);
+    }, 50);
+    return () => {
+      clearInterval(id);
+      cancelAnimationFrame(frame);
+    };
   }, []);
 
   const tap = (index: number) => {
@@ -46,7 +59,7 @@ const Game = ({ boards, round, onClick, onTimeUp }: Props) => {
       {board.map((color, i) => (
         <Cell $color={color} key={i} onPointerDown={() => tap(i)} />
       ))}
-      <Seconds>{seconds}</Seconds>
+      <Seconds className="tabular-nums">{secondsLeft.toFixed(2)}</Seconds>
     </div>
   );
 };

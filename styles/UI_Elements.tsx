@@ -45,9 +45,12 @@ const Overlay = styled.div`
   user-select: none;
 `;
 
+// Punkte genau in der Bildschirmmitte
 export const Points = styled(Overlay)`
-  top: 40%;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 10rem;
+  line-height: 1;
   opacity: 0.2;
 `;
 
@@ -70,8 +73,12 @@ export const MissFlash = styled.div<{ $ms: number }>`
   }
 `;
 
+// Restzeit klein oben links
 export const Seconds = styled(Overlay)`
-  bottom: 5%;
-  font-size: 5rem;
-  opacity: 0.1;
+  top: 0.75rem;
+  left: 1rem;
+  right: auto;
+  text-align: left;
+  font-size: 1.5rem;
+  opacity: 0.4;
 `;
