@@ -12,7 +12,8 @@ type Phase = "start" | "game" | "calculating" | "score";
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // Homer soll immer mindestens so lange im Kreis laufen
-const MIN_LOADING_MS = 2000;
+const MIN_LOADING_AFTER_GAME_MS = 2000;
+const MIN_LOADING_LEADERBOARD_MS = 1500;
 
 const App = ({ initialColor }: { initialColor: Color }) => {
   const [phase, setPhase] = useState<Phase>("start");
@@ -24,7 +25,7 @@ const App = ({ initialColor }: { initialColor: Color }) => {
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [error, setError] = useState("");
   const [starting, setStarting] = useState(false);
-  const [loadingLabel, setLoadingLabel] = useState("");
+  const [loading, setLoading] = useState({ label: "", ms: MIN_LOADING_AFTER_GAME_MS });
   const clicks = useRef<number[]>([]);
 
   const start = async () => {
@@ -64,9 +65,9 @@ const App = ({ initialColor }: { initialColor: Color }) => {
 
   const finish = async () => {
     if (!game) return;
-    setLoadingLabel("Calculating your score");
+    setLoading({ label: "Calculating your score", ms: MIN_LOADING_AFTER_GAME_MS });
     setPhase("calculating");
-    const minDelay = wait(MIN_LOADING_MS);
+    const minDelay = wait(MIN_LOADING_AFTER_GAME_MS);
     try {
       const result = await api.finishGame(game.id, name, clicks.current);
       setScore(result.rounds);
@@ -80,9 +81,9 @@ const App = ({ initialColor }: { initialColor: Color }) => {
   const openLeaderboard = () => {
     setError("");
     setScore(null);
-    setLoadingLabel("Loading leaderboard");
+    setLoading({ label: "Loading leaderboard", ms: MIN_LOADING_LEADERBOARD_MS });
     setPhase("calculating");
-    showLeaderboard(wait(MIN_LOADING_MS));
+    showLeaderboard(wait(MIN_LOADING_LEADERBOARD_MS));
   };
 
   const restart = () => {
@@ -109,7 +110,7 @@ const App = ({ initialColor }: { initialColor: Color }) => {
     case "game":
       return game && <Game boards={game.boards} round={round} onClick={click} onTimeUp={finish} />;
     case "calculating":
-      return <Calculating label={loadingLabel} durationMs={MIN_LOADING_MS} />;
+      return <Calculating label={loading.label} durationMs={loading.ms} />;
     case "score":
       return (
         <Score score={score} name={name} leaders={leaders} error={error} onRestart={restart} />
