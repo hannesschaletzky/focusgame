@@ -1,13 +1,5 @@
 import styled from "styled-components";
 
-export const Input = styled.input`
-  background-color: #f1f1f1;
-  padding: 1rem;
-  border-radius: 8px;
-  outline: none;
-  text-align: center;
-`;
-
 export const StartButton = styled.button`
   height: 50px;
   min-width: 100px;
@@ -28,8 +20,9 @@ export const StartButton = styled.button`
     box-shadow: none;
   }
   &:disabled {
-    opacity: 0.6;
-    cursor: wait;
+    opacity: 0.4;
+    cursor: default;
+    box-shadow: none;
   }
 `;
 
