@@ -6,3 +6,5 @@ data
 .env*
 Dockerfile
 *.md
+tests
+vitest.config.mts

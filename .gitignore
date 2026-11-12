@@ -38,6 +38,3 @@ yarn-error.log*
 
 # SQLite
 /data/
-
-# Claude Code (lokale Einstellungen)
-.claude/settings.local.json

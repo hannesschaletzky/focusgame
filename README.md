@@ -12,13 +12,14 @@ Stack: Next.js, React, TypeScript, Tailwind, styled-components, SQLite (`node:sq
   counts the score and checks that the game ended within the time window.
 - `GET /api/leaderboard` returns the top 10, best run per name.
 
-The SQLite file lives at `DB_PATH` (default `./data/focus.db`). `PRAGMA user_version` tracks one-time data migrations (see `utils/db.ts`).
+The SQLite file lives at `DB_PATH` (default `./data/focus.db`). `PRAGMA user_version` tracks one-time data migrations (see `src/utils/db.ts`).
 
 ## Development
 
 ```sh
 npm install
 npm run dev
+npm test   # server game logic: scoring, time window, leaderboard, migrations
 ```
 
 ## Deployment
