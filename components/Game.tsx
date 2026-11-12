@@ -5,6 +5,7 @@ import { GAME_SECONDS } from "@/utils/constants";
 interface Props {
   boards: string[][];
   round: number;
+  onBegin: () => void;
   onClick: (index: number) => boolean;
   onTimeUp: () => void;
 }
@@ -12,7 +13,9 @@ interface Props {
 // Dauer des roten Blitzes nach einem Fehlklick
 const MISS_FLASH_MS = 300;
 
-const Game = ({ boards, round, onClick, onTimeUp }: Props) => {
+const Game = ({ boards, round, onBegin, onClick, onTimeUp }: Props) => {
+  // Der Countdown startet erst mit dem ersten Tipp, vorher kann man sich das Feld ansehen
+  const [started, setStarted] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(GAME_SECONDS);
   const [missCount, setMissCount] = useState(0);
   const timeUp = useEffectEvent(onTimeUp);
@@ -21,6 +24,7 @@ const Game = ({ boards, round, onClick, onTimeUp }: Props) => {
   // setInterval läuft auch in einem Tab im Hintergrund weiter, requestAnimationFrame nicht.
   // Anzeige: pro Frame neu, damit die Hundertstel flüssig herunterlaufen.
   useEffect(() => {
+    if (!started) return;
     const startedAt = performance.now();
     const leftAt = (now: number) => Math.max(0, GAME_SECONDS - (now - startedAt) / 1000);
 
@@ -43,9 +47,13 @@ const Game = ({ boards, round, onClick, onTimeUp }: Props) => {
       clearInterval(id);
       cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [started]);
 
   const tap = (index: number) => {
+    if (!started) {
+      setStarted(true);
+      onBegin();
+    }
     if (!onClick(index)) setMissCount((n) => n + 1);
   };
 
@@ -59,7 +67,10 @@ const Game = ({ boards, round, onClick, onTimeUp }: Props) => {
       {board.map((color, i) => (
         <Cell $color={color} key={i} onPointerDown={() => tap(i)} />
       ))}
-      <Seconds className="tabular-nums">{secondsLeft.toFixed(2)}</Seconds>
+      <Seconds className="tabular-nums">
+        {secondsLeft.toFixed(2)}
+        {!started && <span className="ml-2 text-base">starts on first tap</span>}
+      </Seconds>
     </div>
   );
 };

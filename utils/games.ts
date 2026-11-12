@@ -12,6 +12,8 @@ import type { FinishedGame, LeaderboardEntry, NewGame } from "@/utils/types";
 
 // Spielraum für Netzwerk und Rendering nach Ablauf der 5 Sekunden
 const GRACE_MS = 5_000;
+// Die Startmeldung kommt etwas nach dem ersten Tipp an; so viel darf ein Spiel scheinbar zu kurz sein
+const EARLY_TOLERANCE_MS = 1_000;
 const STALE_MS = 60 * 60 * 1000;
 
 export class GameError extends Error {
@@ -55,20 +57,33 @@ const parseClicks = (raw: unknown): number[] => {
   return raw;
 };
 
+// Erster Tipp: ab hier läuft das Zeitfenster. Wiederholte Meldungen ändern nichts.
+export const beginGame = (id: string) => {
+  const db = getDB();
+  const game = db.prepare("SELECT finished_at FROM games WHERE id = ?").get(id) as
+    | { finished_at: number | null }
+    | undefined;
+  if (!game) throw new GameError(404, "Spiel nicht gefunden");
+  if (game.finished_at !== null) throw new GameError(409, "Spiel schon beendet");
+  db.prepare("UPDATE games SET begun_at = ? WHERE id = ? AND begun_at IS NULL").run(Date.now(), id);
+};
+
 // Der Server zählt selbst: Klicks werden gegen die gespeicherten Lösungen nachgespielt
 export const finishGame = (id: string, rawName: unknown, rawClicks: unknown): FinishedGame => {
   const name = normalizeName(rawName);
   const clicks = parseClicks(rawClicks);
   const db = getDB();
   const game = db
-    .prepare("SELECT solutions, started_at, finished_at FROM games WHERE id = ?")
-    .get(id) as { solutions: string; started_at: number; finished_at: number | null } | undefined;
+    .prepare("SELECT solutions, begun_at, finished_at FROM games WHERE id = ?")
+    .get(id) as { solutions: string; begun_at: number | null; finished_at: number | null } | undefined;
 
   if (!game) throw new GameError(404, "Spiel nicht gefunden");
   if (game.finished_at !== null) throw new GameError(409, "Spiel schon beendet");
 
-  const elapsed = Date.now() - game.started_at;
-  if (elapsed < GAME_SECONDS * 1000) throw new GameError(400, "Zu früh beendet");
+  if (game.begun_at === null) throw new GameError(400, "Spiel nie gestartet");
+
+  const elapsed = Date.now() - game.begun_at;
+  if (elapsed < GAME_SECONDS * 1000 - EARLY_TOLERANCE_MS) throw new GameError(400, "Zu früh beendet");
   if (elapsed > GAME_SECONDS * 1000 + GRACE_MS) throw new GameError(410, "Zeit abgelaufen");
 
   const solutions = JSON.parse(game.solutions) as number[];

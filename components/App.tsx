@@ -27,6 +27,8 @@ const App = ({ initialColor }: { initialColor: Color }) => {
   const [starting, setStarting] = useState(false);
   const [loading, setLoading] = useState({ label: "", ms: MIN_LOADING_AFTER_GAME_MS });
   const clicks = useRef<number[]>([]);
+  // Startmeldung an den Server; finish wartet darauf, damit die Reihenfolge stimmt
+  const begun = useRef<Promise<unknown> | null>(null);
 
   // Die Seiten scrollen normal; jede neue Phase beginnt oben
   useEffect(() => {
@@ -39,6 +41,7 @@ const App = ({ initialColor }: { initialColor: Color }) => {
     try {
       const newGame = await api.createGame(color);
       clicks.current = [];
+      begun.current = null;
       setRound(0);
       setGame(newGame);
       setPhase("game");
@@ -71,12 +74,19 @@ const App = ({ initialColor }: { initialColor: Color }) => {
     setPhase("score");
   };
 
+  // Erster Tipp: Countdown läuft, Server merkt sich den Start
+  const begin = () => {
+    if (!game || begun.current) return;
+    begun.current = api.beginGame(game.id).catch(() => {});
+  };
+
   const finish = async () => {
     if (!game) return;
     setLoading({ label: "Calculating your score", ms: MIN_LOADING_AFTER_GAME_MS });
     setPhase("calculating");
     const minDelay = wait(MIN_LOADING_AFTER_GAME_MS);
     try {
+      await begun.current;
       const result = await api.finishGame(game.id, name, clicks.current);
       setScore(result.rounds);
     } catch (err) {
@@ -116,7 +126,13 @@ const App = ({ initialColor }: { initialColor: Color }) => {
         />
       );
     case "game":
-      return game && <Game boards={game.boards} round={round} onClick={click} onTimeUp={finish} />;
+      return game && <Game
+          boards={game.boards}
+          round={round}
+          onBegin={begin}
+          onClick={click}
+          onTimeUp={finish}
+        />;
     case "calculating":
       return <Calculating label={loading.label} durationMs={loading.ms} />;
     case "score":
