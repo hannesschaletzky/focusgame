@@ -8,7 +8,7 @@ import {
   NAME_MAX_LENGTH,
   type Color,
 } from "@/utils/constants";
-import type { FinishedGame, LeaderboardEntry, NewGame } from "@/utils/types";
+import type { FinishedGame, Leaderboard, LeaderboardEntry, NewGame } from "@/utils/types";
 
 // Spielraum für Netzwerk und Rendering nach Ablauf der 5 Sekunden
 const GRACE_MS = 5_000;
@@ -100,28 +100,54 @@ export const finishGame = (id: string, rawName: unknown, rawClicks: unknown): Fi
     .run(Date.now(), name, rounds, id);
   if (result.changes !== 1) throw new GameError(409, "Spiel schon beendet");
 
-  return { rounds };
+  return { rounds, games: gamesPlayed(name) };
 };
 
+// Beendete Spiele eines Namens, ohne Groß/Klein zu unterscheiden (wie die Bestenliste)
+export const gamesPlayed = (name: string): number =>
+  (
+    getDB()
+      .prepare("SELECT COUNT(*) AS n FROM games WHERE finished_at IS NOT NULL AND lower(name) = lower(?)")
+      .get(name) as { n: number }
+  ).n;
+
+// Alle beendeten Spiele, auch die mit 0 Punkten
+export const totalGames = (): number =>
+  (getDB().prepare("SELECT COUNT(*) AS n FROM games WHERE finished_at IS NOT NULL").get() as { n: number })
+    .n;
+
 // Top 10, pro Name (ohne Groß/Klein) nur der beste Lauf; bei Gleichstand gewinnt, wer zuerst da war
+// Dazu pro Name die Zahl aller beendeten Spiele, auch der mit 0 Punkten
 export const leaderboard = (): LeaderboardEntry[] => {
   const rows = getDB()
     .prepare(
-      `SELECT name, rounds, color, finished_at FROM (
+      `SELECT best.name, best.rounds, best.color, best.finished_at, played.games FROM (
          SELECT name, rounds, color, finished_at,
                 ROW_NUMBER() OVER (PARTITION BY lower(name) ORDER BY rounds DESC, finished_at ASC) AS rn
          FROM games
          WHERE finished_at IS NOT NULL AND rounds > 0
-       )
-       WHERE rn = 1
-       ORDER BY rounds DESC, finished_at ASC
+       ) AS best
+       JOIN (
+         SELECT lower(name) AS key, COUNT(*) AS games
+         FROM games
+         WHERE finished_at IS NOT NULL
+         GROUP BY lower(name)
+       ) AS played ON played.key = lower(best.name)
+       WHERE best.rn = 1
+       ORDER BY best.rounds DESC, best.finished_at ASC
        LIMIT 10`
     )
-    .all() as { name: string; rounds: number; color: string; finished_at: number }[];
+    .all() as { name: string; rounds: number; color: string; finished_at: number; games: number }[];
   return rows.map((r) => ({
     name: r.name,
     rounds: r.rounds,
     color: r.color,
     date: new Date(r.finished_at).toISOString(),
+    games: r.games,
   }));
 };
+
+export const leaderboardWithTotals = (): Leaderboard => ({
+  players: leaderboard(),
+  totalGames: totalGames(),
+});

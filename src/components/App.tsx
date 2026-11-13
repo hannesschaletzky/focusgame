@@ -5,7 +5,7 @@ import Calculating from "@/components/Calculating";
 import Score from "@/components/Score";
 import * as api from "@/utils/api";
 import { randomColor, type Color } from "@/utils/constants";
-import type { LeaderboardEntry, NewGame } from "@/utils/types";
+import type { Leaderboard, NewGame } from "@/utils/types";
 
 type Phase = "start" | "game" | "calculating" | "score";
 
@@ -22,7 +22,9 @@ const App = ({ initialColor }: { initialColor: Color }) => {
   const [game, setGame] = useState<NewGame | null>(null);
   const [round, setRound] = useState(0);
   const [score, setScore] = useState<number | null>(null);
-  const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
+  const [board, setBoard] = useState<Leaderboard>({ players: [], totalGames: 0 });
+  // Wie viele Spiele dieser Name insgesamt beendet hat (nur nach einem eigenen Spiel bekannt)
+  const [myGames, setMyGames] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [starting, setStarting] = useState(false);
   const [loading, setLoading] = useState({ label: "", ms: MIN_LOADING_AFTER_GAME_MS });
@@ -65,9 +67,9 @@ const App = ({ initialColor }: { initialColor: Color }) => {
   // Ladeanimation mindestens kurz zeigen, dann Bestenliste
   const showLeaderboard = async (minDelay: Promise<unknown>) => {
     try {
-      setLeaders(await api.getLeaderboard());
+      setBoard(await api.getLeaderboard());
     } catch {
-      setLeaders([]);
+      setBoard({ players: [], totalGames: 0 });
       setError("Leaderboard could not be loaded.");
     }
     await minDelay;
@@ -89,8 +91,10 @@ const App = ({ initialColor }: { initialColor: Color }) => {
       await begun.current;
       const result = await api.finishGame(game.id, name, clicks.current);
       setScore(result.rounds);
+      setMyGames(result.games);
     } catch (err) {
       setScore(round);
+      setMyGames(null);
       setError(`Score not saved: ${(err as Error).message}`);
     }
     await showLeaderboard(minDelay);
@@ -99,6 +103,7 @@ const App = ({ initialColor }: { initialColor: Color }) => {
   const openLeaderboard = () => {
     setError("");
     setScore(null);
+    setMyGames(null);
     setLoading({ label: "Loading leaderboard", ms: MIN_LOADING_LEADERBOARD_MS });
     setPhase("calculating");
     showLeaderboard(wait(MIN_LOADING_LEADERBOARD_MS));
@@ -107,6 +112,7 @@ const App = ({ initialColor }: { initialColor: Color }) => {
   const restart = () => {
     setError("");
     setScore(null);
+    setMyGames(null);
     setGame(null);
     setColor(randomColor());
     setPhase("start");
@@ -137,7 +143,15 @@ const App = ({ initialColor }: { initialColor: Color }) => {
       return <Calculating label={loading.label} durationMs={loading.ms} />;
     case "score":
       return (
-        <Score score={score} name={name} leaders={leaders} error={error} onRestart={restart} />
+        <Score
+          score={score}
+          name={name}
+          leaders={board.players}
+          totalGames={board.totalGames}
+          myGames={myGames}
+          error={error}
+          onRestart={restart}
+        />
       );
   }
 };

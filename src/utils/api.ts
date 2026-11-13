@@ -1,4 +1,4 @@
-import type { FinishedGame, LeaderboardEntry, NewGame } from "@/utils/types";
+import type { FinishedGame, Leaderboard, NewGame } from "@/utils/types";
 
 const request = async <T>(url: string, init?: RequestInit): Promise<T> => {
   const res = await fetch(url, {
@@ -22,4 +22,4 @@ export const finishGame = (id: string, name: string, clicks: number[]) =>
     body: JSON.stringify({ name, clicks }),
   });
 
-export const getLeaderboard = () => request<LeaderboardEntry[]>("/api/leaderboard");
+export const getLeaderboard = () => request<Leaderboard>("/api/leaderboard");

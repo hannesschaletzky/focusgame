@@ -3,6 +3,12 @@ export interface LeaderboardEntry {
   rounds: number;
   color: string;
   date: string; // ISO
+  games: number; // alle beendeten Spiele dieses Namens
+}
+
+export interface Leaderboard {
+  players: LeaderboardEntry[];
+  totalGames: number; // alle beendeten Spiele insgesamt
 }
 
 export interface NewGame {
@@ -12,4 +18,5 @@ export interface NewGame {
 
 export interface FinishedGame {
   rounds: number;
+  games: number; // so viele Spiele hat dieser Name jetzt insgesamt beendet
 }

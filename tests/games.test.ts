@@ -82,7 +82,7 @@ describe("Punkte zählen", () => {
     const clicks = [sol[0], miss(1), sol[1], sol[2], miss(3), miss(3), sol[3]];
     games.beginGame(id);
     at(5_100);
-    expect(games.finishGame(id, "Anna", clicks)).toEqual({ rounds: 4 });
+    expect(games.finishGame(id, "Anna", clicks)).toEqual({ rounds: 4, games: 1 });
   });
 
   it("ein Klick auf eine spätere Lösung zählt nicht vor", () => {
@@ -105,11 +105,11 @@ describe("Zeitfenster", () => {
 
   it("misst ab dem ersten Tipp, nicht ab dem Anlegen", () => {
     // 30 Sekunden umschauen, dann normal spielen
-    expect(play("Dana", 3, { beginAfter: 30_000 })).toEqual({ rounds: 3 });
+    expect(play("Dana", 3, { beginAfter: 30_000 })).toEqual({ rounds: 3, games: 1 });
   });
 
   it("lässt eine Sekunde Spielraum nach unten (Startmeldung kommt später an)", () => {
-    expect(play("Emil", 2, { finishAfter: 4_100 })).toEqual({ rounds: 2 });
+    expect(play("Emil", 2, { finishAfter: 4_100 })).toEqual({ rounds: 2, games: 1 });
   });
 
   it("lehnt ein deutlich zu frühes Ende ab", () => {
@@ -214,6 +214,44 @@ describe("Bestenliste", () => {
     expect(board.length).toBeLessThanOrEqual(10);
     expect(board.every((e) => e.rounds > 0)).toBe(true);
     expect(board.map((e) => e.rounds)).toEqual([...board.map((e) => e.rounds)].sort((a, b) => b - a));
+  });
+});
+
+describe("Zähler", () => {
+  it("zählt alle beendeten Spiele, auch die mit 0 Punkten, aber keine laufenden", () => {
+    play("Quinn", 3);
+    play("Rosa", 0);
+    games.createGame("red"); // angelegt, nie beendet
+    const started = games.createGame("red");
+    games.beginGame(started.id); // gestartet, nie beendet
+    expect(games.totalGames()).toBe(2);
+    expect(games.leaderboardWithTotals().totalGames).toBe(2);
+  });
+
+  it("zählt Spiele pro Name ohne Groß/Klein, auch ohne Punkte", () => {
+    expect(play("Sam", 2).games).toBe(1);
+    expect(play("sam", 0).games).toBe(2);
+    expect(play("SAM", 4).games).toBe(3);
+    expect(play("Tom", 1).games).toBe(1);
+    expect(games.gamesPlayed("sAm")).toBe(3);
+  });
+
+  it("zeigt die Spielzahl in der Bestenliste, auch wenn Läufe mit 0 Punkten dabei sind", () => {
+    play("Uwe", 0);
+    play("Uwe", 0);
+    play("uwe", 3);
+    play("Vera", 2);
+    const board = games.leaderboard();
+    expect(board.map((e) => [e.name, e.games])).toEqual([
+      ["uwe", 3],
+      ["Vera", 1],
+    ]);
+  });
+
+  it("Spieler nur mit 0-Punkte-Läufen stehen nicht in der Liste, zählen aber insgesamt", () => {
+    play("Wim", 0);
+    expect(games.leaderboard()).toEqual([]);
+    expect(games.totalGames()).toBe(1);
   });
 });
 

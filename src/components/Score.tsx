@@ -6,6 +6,8 @@ interface Props {
   score: number | null;
   name: string;
   leaders: LeaderboardEntry[];
+  totalGames: number;
+  myGames: number | null;
   error: string;
   onRestart: () => void;
 }
@@ -15,7 +17,14 @@ const PLACES = 10;
 const pad = (n: number) => String(n).padStart(2, "0");
 const formatDate = (iso: string) => {
   const d = new Date(iso);
-  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${pad(d.getFullYear() % 100)}`;
+};
+
+// 1st, 2nd, 3rd, 4th … 11th, 12th, 13th … 21st
+const ordinal = (n: number) => {
+  const tens = n % 100;
+  const suffix = tens >= 11 && tens <= 13 ? "th" : ({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[n % 10] ?? "th";
+  return `${n}${suffix}`;
 };
 
 const headline = (score: number, myRank: number, leaders: LeaderboardEntry[]) => {
@@ -28,7 +37,7 @@ const headline = (score: number, myRank: number, leaders: LeaderboardEntry[]) =>
   return "";
 };
 
-const Score = ({ score, name, leaders, error, onRestart }: Props) => {
+const Score = ({ score, name, leaders, totalGames, myGames, error, onRestart }: Props) => {
   const [copied, setCopied] = useState(false);
   const me = name.toLowerCase();
 
@@ -56,6 +65,9 @@ const Score = ({ score, name, leaders, error, onRestart }: Props) => {
         <div className="text-center">
           <div className="text-6xl font-black leading-none tabular-nums">{score}</div>
           <div className="mt-2">{headline(score, myRank, leaders)}</div>
+          {myGames !== null && (
+            <div className="mt-1 text-sm opacity-60">That was your {ordinal(myGames)} game.</div>
+          )}
         </div>
       )}
       {error && <div className="text-center text-red-600">{error}</div>}
@@ -94,6 +106,13 @@ const Score = ({ score, name, leaders, error, onRestart }: Props) => {
                     />
                     <span className="flex-1 truncate">
                       {player.name}
+                      {/* Wie oft diese Person insgesamt gespielt hat */}
+                      <span
+                        className="ml-1.5 text-xs font-normal tabular-nums opacity-50"
+                        title={`${player.games} ${player.games === 1 ? "game" : "games"} played`}
+                      >
+                        {player.games}×
+                      </span>
                       {isMe && " ←"}
                     </span>
                     <span className="text-sm tabular-nums opacity-50">
@@ -112,6 +131,7 @@ const Score = ({ score, name, leaders, error, onRestart }: Props) => {
             );
           })}
         </ol>
+        <div className="mt-2 text-sm tabular-nums opacity-50">total games: {totalGames}</div>
       </div>
     </main>
   );
