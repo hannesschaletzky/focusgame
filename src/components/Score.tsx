@@ -7,7 +7,6 @@ interface Props {
   name: string;
   leaders: LeaderboardEntry[];
   totalGames: number;
-  myGames: number | null;
   error: string;
   onRestart: () => void;
 }
@@ -20,24 +19,7 @@ const formatDate = (iso: string) => {
   return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${pad(d.getFullYear() % 100)}`;
 };
 
-// 1st, 2nd, 3rd, 4th … 11th, 12th, 13th … 21st
-const ordinal = (n: number) => {
-  const tens = n % 100;
-  const suffix = tens >= 11 && tens <= 13 ? "th" : ({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[n % 10] ?? "th";
-  return `${n}${suffix}`;
-};
-
-const headline = (score: number, myRank: number, leaders: LeaderboardEntry[]) => {
-  // myRank zeigt den Bestwert des Namens; nur erwähnen, wenn dieser Lauf ihn erreicht hat
-  const hitBest = myRank >= 0 && leaders[myRank].rounds === score;
-  if (hitBest && myRank === 0) return "That's the record.";
-  if (hitBest) return `That's #${myRank + 1} of all time.`;
-  if (score === 0) return "Zero. Happens to the best.";
-  if (leaders.length > 0) return `${leaders[0].name} has ${leaders[0].rounds}. Again?`;
-  return "";
-};
-
-const Score = ({ score, name, leaders, totalGames, myGames, error, onRestart }: Props) => {
+const Score = ({ score, name, leaders, totalGames, error, onRestart }: Props) => {
   const [copied, setCopied] = useState(false);
   const me = name.toLowerCase();
 
@@ -64,10 +46,6 @@ const Score = ({ score, name, leaders, totalGames, myGames, error, onRestart }: 
       {score !== null && (
         <div className="text-center">
           <div className="text-6xl font-black leading-none tabular-nums">{score}</div>
-          <div className="mt-2">{headline(score, myRank, leaders)}</div>
-          {myGames !== null && (
-            <div className="mt-1 text-sm opacity-60">That was your {ordinal(myGames)} game.</div>
-          )}
         </div>
       )}
       {error && <div className="text-center text-red-600">{error}</div>}
