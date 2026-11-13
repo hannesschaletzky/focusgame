@@ -38,3 +38,6 @@ yarn-error.log*
 
 # SQLite
 /data/
+
+# von Next.js erzeugt, je nach dev/build unterschiedlich
+next-env.d.ts
