@@ -34,3 +34,32 @@ body {
     width: 100%;
   }
 }
+
+/* Beispiel auf der Startseite: der "Finger" tippt kurz vor dem Boardwechsel auf das Zielfeld */
+.tap-dot {
+  opacity: 0;
+  animation-name: tap-dot;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+@keyframes tap-dot {
+  0%,
+  55% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+  68% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(0.85);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tap-dot {
+    animation: none;
+    opacity: 1;
+  }
+}

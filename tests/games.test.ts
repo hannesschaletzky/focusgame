@@ -100,7 +100,7 @@ describe("Zeitfenster", () => {
   it("lehnt ein Ende ohne Start ab", () => {
     const { id } = games.createGame("red");
     at(6_000);
-    expect(() => games.finishGame(id, "Cara", [])).toThrow("Spiel nie gestartet");
+    expect(() => games.finishGame(id, "Cara", [])).toThrow("Game was never started");
   });
 
   it("misst ab dem ersten Tipp, nicht ab dem Anlegen", () => {
@@ -113,11 +113,11 @@ describe("Zeitfenster", () => {
   });
 
   it("lehnt ein deutlich zu frühes Ende ab", () => {
-    expect(() => play("Finn", 2, { finishAfter: 3_900 })).toThrow("Zu früh beendet");
+    expect(() => play("Finn", 2, { finishAfter: 3_900 })).toThrow("Game ended too early");
   });
 
   it("lehnt ein zu spätes Ende ab", () => {
-    expect(() => play("Gina", 2, { finishAfter: 10_100 })).toThrow("Zeit abgelaufen");
+    expect(() => play("Gina", 2, { finishAfter: 10_100 })).toThrow("Time is up");
   });
 
   it("ein zweiter Start verschiebt den Startzeitpunkt nicht", () => {
@@ -126,14 +126,14 @@ describe("Zeitfenster", () => {
     at(4_000);
     games.beginGame(id); // wäre sonst ein Trick, um das Fenster zu verlängern
     at(10_500);
-    expect(() => games.finishGame(id, "Hugo", [])).toThrow("Zeit abgelaufen");
+    expect(() => games.finishGame(id, "Hugo", [])).toThrow("Time is up");
   });
 });
 
 describe("Fehlerfälle", () => {
   it("unbekanntes Spiel", () => {
-    expect(() => games.beginGame("nope")).toThrow("Spiel nicht gefunden");
-    expect(() => games.finishGame("nope", "Ida", [])).toThrow("Spiel nicht gefunden");
+    expect(() => games.beginGame("nope")).toThrow("Game not found");
+    expect(() => games.finishGame("nope", "Ida", [])).toThrow("Game not found");
   });
 
   it("doppeltes Beenden", () => {
@@ -141,8 +141,8 @@ describe("Fehlerfälle", () => {
     games.beginGame(id);
     at(5_100);
     games.finishGame(id, "Jan", []);
-    expect(() => games.finishGame(id, "Jan", [])).toThrow("Spiel schon beendet");
-    expect(() => games.beginGame(id)).toThrow("Spiel schon beendet");
+    expect(() => games.finishGame(id, "Jan", [])).toThrow("Game already finished");
+    expect(() => games.beginGame(id)).toThrow("Game already finished");
   });
 
   it.each([
@@ -155,7 +155,7 @@ describe("Fehlerfälle", () => {
     const { id } = games.createGame("red");
     games.beginGame(id);
     at(5_100);
-    expect(() => games.finishGame(id, "Kim", clicks)).toThrow("Ungültige Klicks");
+    expect(() => games.finishGame(id, "Kim", clicks)).toThrow("Invalid clicks");
   });
 });
 
@@ -166,7 +166,7 @@ describe("Namen", () => {
   });
 
   it.each([[""], ["   "], [42], [undefined]])("lehnt %j ab", (name) => {
-    expect(() => games.normalizeName(name)).toThrow("Name fehlt");
+    expect(() => games.normalizeName(name)).toThrow("Name missing");
   });
 });
 

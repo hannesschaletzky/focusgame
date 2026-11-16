@@ -27,3 +27,7 @@ export const isColor = (value: unknown): value is Color =>
 // Auf hellen Spielfarben braucht Text Schwarz, sonst Weiß
 const LIGHT_COLORS: readonly string[] = ["lightgray", "yellow", "aqua", "coral", "hotpink"];
 export const textOn = (color: string) => (LIGHT_COLORS.includes(color) ? "black" : "white");
+
+// Anzeigenamen; intern bleiben die CSS-Farbnamen
+const COLOR_LABELS: Record<string, string> = { lightgray: "light gray", hotpink: "pink" };
+export const colorLabel = (color: string) => COLOR_LABELS[color] ?? color;

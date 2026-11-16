@@ -8,6 +8,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(405).end();
   }
   const color = req.body?.color;
-  if (!isColor(color)) return res.status(400).json({ error: "Unbekannte Farbe" });
+  if (!isColor(color)) return res.status(400).json({ error: "Unknown color" });
   res.status(201).json(createGame(color));
 }

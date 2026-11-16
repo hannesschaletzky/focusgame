@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { StartButton } from "@/styles/UI_Elements";
+import { colorLabel } from "@/utils/constants";
 import type { LeaderboardEntry } from "@/utils/types";
 
 interface Props {
@@ -80,7 +81,7 @@ const Score = ({ score, name, leaders, totalGames, error, onRestart }: Props) =>
                     <span
                       className="h-4 w-10 shrink-0 border border-black/20"
                       style={{ backgroundColor: player.color }}
-                      title={player.color}
+                      title={colorLabel(player.color)}
                     />
                     <span className="flex-1 truncate">
                       {player.name}

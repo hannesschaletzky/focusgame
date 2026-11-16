@@ -40,9 +40,9 @@ export const createGame = (color: Color): NewGame => {
 };
 
 export const normalizeName = (raw: unknown): string => {
-  if (typeof raw !== "string") throw new GameError(400, "Name fehlt");
+  if (typeof raw !== "string") throw new GameError(400, "Name missing");
   const name = raw.replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, NAME_MAX_LENGTH);
-  if (!name) throw new GameError(400, "Name fehlt");
+  if (!name) throw new GameError(400, "Name missing");
   return name;
 };
 
@@ -52,7 +52,7 @@ const parseClicks = (raw: unknown): number[] => {
     raw.length > 10 * BOARDS_PER_GAME ||
     !raw.every((c) => Number.isInteger(c) && c >= 0 && c < CELLS_PER_BOARD)
   ) {
-    throw new GameError(400, "Ungültige Klicks");
+    throw new GameError(400, "Invalid clicks");
   }
   return raw;
 };
@@ -63,8 +63,8 @@ export const beginGame = (id: string) => {
   const game = db.prepare("SELECT finished_at FROM games WHERE id = ?").get(id) as
     | { finished_at: number | null }
     | undefined;
-  if (!game) throw new GameError(404, "Spiel nicht gefunden");
-  if (game.finished_at !== null) throw new GameError(409, "Spiel schon beendet");
+  if (!game) throw new GameError(404, "Game not found");
+  if (game.finished_at !== null) throw new GameError(409, "Game already finished");
   db.prepare("UPDATE games SET begun_at = ? WHERE id = ? AND begun_at IS NULL").run(Date.now(), id);
 };
 
@@ -77,14 +77,14 @@ export const finishGame = (id: string, rawName: unknown, rawClicks: unknown): Fi
     .prepare("SELECT solutions, begun_at, finished_at FROM games WHERE id = ?")
     .get(id) as { solutions: string; begun_at: number | null; finished_at: number | null } | undefined;
 
-  if (!game) throw new GameError(404, "Spiel nicht gefunden");
-  if (game.finished_at !== null) throw new GameError(409, "Spiel schon beendet");
+  if (!game) throw new GameError(404, "Game not found");
+  if (game.finished_at !== null) throw new GameError(409, "Game already finished");
 
-  if (game.begun_at === null) throw new GameError(400, "Spiel nie gestartet");
+  if (game.begun_at === null) throw new GameError(400, "Game was never started");
 
   const elapsed = Date.now() - game.begun_at;
-  if (elapsed < GAME_SECONDS * 1000 - EARLY_TOLERANCE_MS) throw new GameError(400, "Zu früh beendet");
-  if (elapsed > GAME_SECONDS * 1000 + GRACE_MS) throw new GameError(410, "Zeit abgelaufen");
+  if (elapsed < GAME_SECONDS * 1000 - EARLY_TOLERANCE_MS) throw new GameError(400, "Game ended too early");
+  if (elapsed > GAME_SECONDS * 1000 + GRACE_MS) throw new GameError(410, "Time is up");
 
   const solutions = JSON.parse(game.solutions) as number[];
   let rounds = 0;
@@ -98,7 +98,7 @@ export const finishGame = (id: string, rawName: unknown, rawClicks: unknown): Fi
       "UPDATE games SET finished_at = ?, name = ?, rounds = ? WHERE id = ? AND finished_at IS NULL"
     )
     .run(Date.now(), name, rounds, id);
-  if (result.changes !== 1) throw new GameError(409, "Spiel schon beendet");
+  if (result.changes !== 1) throw new GameError(409, "Game already finished");
 
   return { rounds, games: gamesPlayed(name) };
 };
