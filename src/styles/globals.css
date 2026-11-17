@@ -63,3 +63,22 @@ body {
     opacity: 1;
   }
 }
+
+/* Hinweis bei Handy im Querformat: nur Touch-Geräte mit wenig Höhe, also keine Tablets oder Desktops */
+.rotate-hint {
+  display: none;
+}
+@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
+  .rotate-hint {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: #fff;
+    font-size: 1.125rem;
+  }
+}
