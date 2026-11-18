@@ -19,6 +19,20 @@ Stack: Next.js, React, TypeScript, Tailwind, styled-components, SQLite (`node:sq
 
 The SQLite file lives at `DB_PATH` (default `./data/focus.db`). `PRAGMA user_version` tracks one-time data migrations (see `src/utils/db.ts`).
 
+## Cheat check
+
+Every finished game stores a compact click log (time since the first tap, cell, real input, inside the square).
+The server quietly flags games that don't look human: script-triggered clicks, clicks outside the squares, several
+hits less than 120 ms apart, more than 25 points, clicks long after time is up, or a missing log. Flags have no effect
+on scores or the leaderboard; they are only there to look at:
+
+```sh
+# all flagged games
+ssh hschaletzky_com 'cd /opt/infra && docker compose exec -T focus node -' < scripts/check-games.js
+# all games of one player, with click timings
+ssh hschaletzky_com 'cd /opt/infra && docker compose exec -T focus node - Fettfinger' < scripts/check-games.js
+```
+
 ## Development
 
 ```sh

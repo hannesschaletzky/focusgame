@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Start from "@/components/Start";
-import Game from "@/components/Game";
+import Game, { type ClickMeta } from "@/components/Game";
 import Calculating from "@/components/Calculating";
 import Score from "@/components/Score";
 import * as api from "@/utils/api";
@@ -27,6 +27,7 @@ const App = ({ initialColor }: { initialColor: Color }) => {
   const [starting, setStarting] = useState(false);
   const [loading, setLoading] = useState({ label: "", ms: MIN_LOADING_AFTER_GAME_MS });
   const clicks = useRef<number[]>([]);
+  const clickLog = useRef<ClickMeta[]>([]);
   // Startmeldung an den Server; finish wartet darauf, damit die Reihenfolge stimmt
   const begun = useRef<Promise<unknown> | null>(null);
 
@@ -41,6 +42,7 @@ const App = ({ initialColor }: { initialColor: Color }) => {
     try {
       const newGame = await api.createGame(color);
       clicks.current = [];
+      clickLog.current = [];
       begun.current = null;
       setRound(0);
       setGame(newGame);
@@ -55,9 +57,10 @@ const App = ({ initialColor }: { initialColor: Color }) => {
   };
 
   // Gibt zurück, ob getroffen wurde; das Spielfeld zeigt danach Treffer oder Fehler an
-  const click = (index: number) => {
+  const click = (index: number, meta: ClickMeta) => {
     if (!game) return false;
     clicks.current.push(index);
+    clickLog.current.push(meta);
     const board = game.boards[Math.min(round, game.boards.length - 1)];
     const hit = board[index] === color;
     if (hit) setRound((r) => r + 1);
@@ -89,7 +92,7 @@ const App = ({ initialColor }: { initialColor: Color }) => {
     const minDelay = wait(MIN_LOADING_AFTER_GAME_MS);
     try {
       await begun.current;
-      const result = await api.finishGame(game.id, name, clicks.current);
+      const result = await api.finishGame(game.id, name, clicks.current, clickLog.current);
       setScore(result.rounds);
     } catch (err) {
       setScore(round);

@@ -7,9 +7,19 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(405).end();
   }
   try {
-    res.status(200).json(finishGame(String(req.query.id), req.body?.name, req.body?.clicks));
+    res
+      .status(200)
+      .json(
+        finishGame(
+          String(req.query.id),
+          req.body?.name,
+          req.body?.clicks,
+          req.body?.log,
+        ),
+      );
   } catch (err) {
-    if (err instanceof GameError) return res.status(err.status).json({ error: err.message });
+    if (err instanceof GameError)
+      return res.status(err.status).json({ error: err.message });
     throw err;
   }
 }

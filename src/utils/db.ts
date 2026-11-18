@@ -10,7 +10,8 @@ const DB_PATH = process.env.DB_PATH ?? "./data/focus.db";
 const MAX_PAGES = Number(process.env.DB_MAX_PAGES) || 12800;
 
 export const isDiskFull = (err: unknown) =>
-  err instanceof Error && /SQLITE_FULL|database or disk is full/i.test(err.message);
+  err instanceof Error &&
+  /SQLITE_FULL|database or disk is full/i.test(err.message);
 
 // Einmalige Änderungen an den Daten, der Reihe nach. Wie viele schon gelaufen sind,
 // steht in PRAGMA user_version; jede läuft also genau einmal pro Datenbank.
@@ -45,18 +46,30 @@ export const getDB = () => {
       begun_at    INTEGER,
       finished_at INTEGER,
       name        TEXT,
-      rounds      INTEGER
+      rounds      INTEGER,
+      clicklog    TEXT,
+      flags       TEXT
     );
     CREATE INDEX IF NOT EXISTS games_finished ON games (finished_at, rounds);
   `);
 
-  // begun_at kam später dazu; ältere Datenbanken ergänzen
-  const columns = db.prepare("PRAGMA table_info(games)").all() as { name: string }[];
-  if (!columns.some((c) => c.name === "begun_at")) {
-    db.exec("ALTER TABLE games ADD COLUMN begun_at INTEGER");
+  // Später dazugekommene Spalten in älteren Datenbanken ergänzen:
+  // begun_at = erster Tipp, clicklog = Klickprotokoll, flags = Gründe, falls ein Spiel verdächtig ist
+  const columns = (
+    db.prepare("PRAGMA table_info(games)").all() as { name: string }[]
+  ).map((c) => c.name);
+  for (const [name, type] of [
+    ["begun_at", "INTEGER"],
+    ["clicklog", "TEXT"],
+    ["flags", "TEXT"],
+  ]) {
+    if (!columns.includes(name))
+      db.exec(`ALTER TABLE games ADD COLUMN ${name} ${type}`);
   }
 
-  const { user_version } = db.prepare("PRAGMA user_version").get() as { user_version: number };
+  const { user_version } = db.prepare("PRAGMA user_version").get() as {
+    user_version: number;
+  };
   if (user_version < MIGRATIONS.length) {
     db.exec("BEGIN");
     for (const sql of MIGRATIONS.slice(user_version)) db.exec(sql);

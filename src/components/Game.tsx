@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState, type PointerEvent } from "react";
 import { Cell, MissFlash, Points, Seconds } from "@/styles/UI_Elements";
 import { GAME_SECONDS } from "@/utils/constants";
 
@@ -6,9 +6,12 @@ interface Props {
   boards: string[][];
   round: number;
   onBegin: () => void;
-  onClick: (index: number) => boolean;
+  onClick: (index: number, meta: ClickMeta) => boolean;
   onTimeUp: () => void;
 }
+
+// Für den unauffälligen Schummelschutz: wann (ms seit dem ersten Tipp), echt (isTrusted), im Feld
+export type ClickMeta = [number, 0 | 1, 0 | 1];
 
 // Dauer des roten Blitzes nach einem Fehlklick
 const MISS_FLASH_MS = 300;
@@ -19,6 +22,7 @@ const Game = ({ boards, round, onBegin, onClick, onTimeUp }: Props) => {
   const [secondsLeft, setSecondsLeft] = useState(GAME_SECONDS);
   const [missCount, setMissCount] = useState(0);
   const timeUp = useEffectEvent(onTimeUp);
+  const firstTapAt = useRef<number | null>(null);
 
   // Spielende: Restzeit aus der Uhr berechnen statt Intervalle zu zählen, damit nichts driftet.
   // setInterval läuft auch in einem Tab im Hintergrund weiter, requestAnimationFrame nicht.
@@ -49,12 +53,21 @@ const Game = ({ boards, round, onBegin, onClick, onTimeUp }: Props) => {
     };
   }, [started]);
 
-  const tap = (index: number) => {
+  const tap = (index: number, e: PointerEvent<HTMLDivElement>) => {
     if (!started) {
       setStarted(true);
       onBegin();
     }
-    if (!onClick(index)) setMissCount((n) => n + 1);
+    firstTapAt.current ??= e.timeStamp;
+    const r = e.currentTarget.getBoundingClientRect();
+    const inside =
+      e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    const meta: ClickMeta = [
+      Math.max(0, Math.round(e.timeStamp - firstTapAt.current)),
+      e.isTrusted ? 1 : 0,
+      inside ? 1 : 0,
+    ];
+    if (!onClick(index, meta)) setMissCount((n) => n + 1);
   };
 
   const board = boards[Math.min(round, boards.length - 1)];
@@ -65,7 +78,7 @@ const Game = ({ boards, round, onBegin, onClick, onTimeUp }: Props) => {
       {/* key startet den roten Blitz bei jedem Fehlklick neu */}
       {missCount > 0 && <MissFlash key={missCount} $ms={MISS_FLASH_MS} />}
       {board.map((color, i) => (
-        <Cell $color={color} key={i} onPointerDown={() => tap(i)} />
+        <Cell $color={color} key={i} onPointerDown={(e) => tap(i, e)} />
       ))}
       <Seconds className="tabular-nums">
         {secondsLeft.toFixed(2)}

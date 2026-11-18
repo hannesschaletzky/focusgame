@@ -23,10 +23,10 @@ export const createGame = (color: string) =>
 export const beginGame = (id: string) =>
   request<object>(`/api/games/${encodeURIComponent(id)}/begin`, { method: "POST" });
 
-export const finishGame = (id: string, name: string, clicks: number[]) =>
+export const finishGame = (id: string, name: string, clicks: number[], log: unknown[]) =>
   request<FinishedGame>(`/api/games/${encodeURIComponent(id)}/finish`, {
     method: "POST",
-    body: JSON.stringify({ name, clicks }),
+    body: JSON.stringify({ name, clicks, log }),
   });
 
 export const getLeaderboard = () => request<Leaderboard>("/api/leaderboard");

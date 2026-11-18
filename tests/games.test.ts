@@ -255,6 +255,35 @@ describe("Zähler", () => {
   });
 });
 
+describe("Schummelschutz in der Datenbank", () => {
+  const stored = (id: string) => {
+    const db = new DatabaseSync(process.env.DB_PATH!);
+    const row = db.prepare("SELECT clicklog, flags FROM games WHERE id = ?").get(id) as {
+      clicklog: string;
+      flags: string | null;
+    };
+    db.close();
+    return row;
+  };
+
+  it("speichert Protokoll und Vermerk, ohne die Punkte zu ändern", () => {
+    const human = games.createGame("red");
+    const bot = games.createGame("red");
+    const humanSol = solutionsOf(human.id).slice(0, 3);
+    const botSol = solutionsOf(bot.id).slice(0, 3);
+    games.beginGame(human.id);
+    games.beginGame(bot.id);
+    at(5_100);
+    const a = games.finishGame(human.id, "Mensch", humanSol, humanSol.map((_, i) => [i * 500, 1, 1]));
+    const b = games.finishGame(bot.id, "Skript", botSol, botSol.map((_, i) => [i * 500, 0, 0]));
+    expect([a.rounds, b.rounds]).toEqual([3, 3]); // nur markieren, keine Folgen
+    expect(stored(human.id).flags).toBeNull();
+    expect(stored(bot.id).flags).toBe("untrusted clicks, clicks outside squares");
+    expect(JSON.parse(stored(human.id).clicklog)).toHaveLength(3);
+    expect(games.leaderboard().map((e) => e.name).sort()).toEqual(["Mensch", "Skript"]);
+  });
+});
+
 describe("Speicherplatz", () => {
   it("leert die Lösungen beim Beenden, laufende Spiele behalten sie", () => {
     const running = games.createGame("red");
