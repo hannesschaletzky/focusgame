@@ -255,6 +255,40 @@ describe("Zähler", () => {
   });
 });
 
+describe("Speicherplatz", () => {
+  it("leert die Lösungen beim Beenden, laufende Spiele behalten sie", () => {
+    const running = games.createGame("red");
+    const { id } = games.createGame("red");
+    games.beginGame(id);
+    at(5_100);
+    games.finishGame(id, "Xaver", []);
+    const db = new DatabaseSync(process.env.DB_PATH!);
+    const row = db.prepare("SELECT solutions FROM games WHERE id = ?").get(id) as { solutions: string };
+    db.close();
+    expect(row.solutions).toBe("");
+    expect(solutionsOf(running.id)).toHaveLength(100);
+  });
+
+  it("an der Obergrenze gibt es 507 statt eines Absturzes, Lesen geht weiter", async () => {
+    play("Yara", 2);
+    process.env.DB_MAX_PAGES = "12"; // 48 KiB statt 50 MiB
+    vi.resetModules();
+    const small: Games = await import("@/utils/games");
+    let error: unknown;
+    for (let i = 0; i < 1_000 && !error; i++) {
+      try {
+        small.createGame("red");
+      } catch (err) {
+        error = err;
+      }
+    }
+    delete process.env.DB_MAX_PAGES;
+    expect(error).toBeInstanceOf(small.GameError);
+    expect(error).toMatchObject({ status: 507, message: "Storage full" });
+    expect(small.leaderboard().map((e) => e.name)).toEqual(["Yara"]);
+  });
+});
+
 describe("Datenbank-Migrationen", () => {
   it("entfernt alte Testeinträge, behält echte Spiele und ergänzt begun_at", async () => {
     // Stand wie live vor dem Update: Version 1, ohne begun_at, Testeinträge + ein echtes Spiel
@@ -265,6 +299,7 @@ describe("Datenbank-Migrationen", () => {
       INSERT INTO games VALUES ('t1', 'yellow', '[]', 1, 1, 'Homer', 5);
       INSERT INTO games VALUES ('t2', 'red', '[]', 1, 1, 'Lisa', 5);
       INSERT INTO games VALUES ('r1', 'blue', '[3,7]', 2, 2, 'Hannes', 7);
+      INSERT INTO games VALUES ('r2', 'red', '[5,1]', 3, NULL, NULL, NULL);
       PRAGMA user_version = 1;
     `);
     old.close();
@@ -278,8 +313,17 @@ describe("Datenbank-Migrationen", () => {
     const columns = (db.prepare("PRAGMA table_info(games)").all() as { name: string }[]).map(
       (c) => c.name
     );
+    const solutions = db.prepare("SELECT id, solutions FROM games ORDER BY id").all() as {
+      id: string;
+      solutions: string;
+    }[];
     db.close();
-    expect(version.user_version).toBe(2);
+    // Migration 3: beendete Spiele ohne Lösungen, laufende behalten sie
+    expect(solutions).toEqual([
+      { id: "r1", solutions: "" },
+      { id: "r2", solutions: "[5,1]" },
+    ]);
+    expect(version.user_version).toBe(3);
     expect(columns).toContain("begun_at");
   });
 });

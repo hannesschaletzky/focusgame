@@ -1,12 +1,19 @@
 import type { FinishedGame, Leaderboard, NewGame } from "@/utils/types";
 
+// Der Server hat geantwortet, aber mit einem Fehler (im Gegensatz zu einem Netzwerkfehler)
+export class ApiError extends Error {
+  constructor(public status: number, message: string) {
+    super(message);
+  }
+}
+
 const request = async <T>(url: string, init?: RequestInit): Promise<T> => {
   const res = await fetch(url, {
     ...init,
     headers: { "Content-Type": "application/json" },
   });
   const body = res.status === 204 ? {} : await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
+  if (!res.ok) throw new ApiError(res.status, body.error ?? `HTTP ${res.status}`);
   return body as T;
 };
 

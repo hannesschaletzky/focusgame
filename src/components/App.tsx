@@ -45,8 +45,10 @@ const App = ({ initialColor }: { initialColor: Color }) => {
       setRound(0);
       setGame(newGame);
       setPhase("game");
-    } catch {
-      setError("Server not reachable, please try again.");
+    } catch (err) {
+      setError(
+        err instanceof api.ApiError ? err.message : "Server not reachable, please try again."
+      );
     } finally {
       setStarting(false);
     }

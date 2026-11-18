@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { getDB } from "@/utils/db";
+import { getDB, isDiskFull } from "@/utils/db";
 import { constructBoard } from "@/utils/board";
 import {
   BOARDS_PER_GAME,
@@ -22,6 +22,16 @@ export class GameError extends Error {
   }
 }
 
+// Schreibzugriffe: ist die Datenbank an ihrer Obergrenze, gibt es 507 statt eines Absturzes
+const write = <T>(fn: () => T): T => {
+  try {
+    return fn();
+  } catch (err) {
+    if (isDiskFull(err)) throw new GameError(507, "Storage full");
+    throw err;
+  }
+};
+
 export const createGame = (color: Color): NewGame => {
   const db = getDB();
   const now = Date.now();
@@ -30,11 +40,10 @@ export const createGame = (color: Color): NewGame => {
 
   const boards = Array.from({ length: BOARDS_PER_GAME }, () => constructBoard(color));
   const id = randomUUID();
-  db.prepare("INSERT INTO games (id, color, solutions, started_at) VALUES (?, ?, ?, ?)").run(
-    id,
-    color,
-    JSON.stringify(boards.map((b) => b.solution)),
-    now
+  write(() =>
+    db
+      .prepare("INSERT INTO games (id, color, solutions, started_at) VALUES (?, ?, ?, ?)")
+      .run(id, color, JSON.stringify(boards.map((b) => b.solution)), now)
   );
   return { id, boards: boards.map((b) => b.cells) };
 };
@@ -65,7 +74,9 @@ export const beginGame = (id: string) => {
     | undefined;
   if (!game) throw new GameError(404, "Game not found");
   if (game.finished_at !== null) throw new GameError(409, "Game already finished");
-  db.prepare("UPDATE games SET begun_at = ? WHERE id = ? AND begun_at IS NULL").run(Date.now(), id);
+  write(() =>
+    db.prepare("UPDATE games SET begun_at = ? WHERE id = ? AND begun_at IS NULL").run(Date.now(), id)
+  );
 };
 
 // Der Server zählt selbst: Klicks werden gegen die gespeicherten Lösungen nachgespielt
@@ -92,12 +103,15 @@ export const finishGame = (id: string, rawName: unknown, rawClicks: unknown): Fi
     if (rounds < solutions.length && click === solutions[rounds]) rounds++;
   }
 
-  // finished_at IS NULL schützt gegen doppeltes Absenden
-  const result = db
-    .prepare(
-      "UPDATE games SET finished_at = ?, name = ?, rounds = ? WHERE id = ? AND finished_at IS NULL"
-    )
-    .run(Date.now(), name, rounds, id);
+  // finished_at IS NULL schützt gegen doppeltes Absenden.
+  // Die Lösungen werden danach nicht mehr gebraucht und geleert, das spart rund drei Viertel des Platzes.
+  const result = write(() =>
+    db
+      .prepare(
+        "UPDATE games SET finished_at = ?, name = ?, rounds = ?, solutions = '' WHERE id = ? AND finished_at IS NULL"
+      )
+      .run(Date.now(), name, rounds, id)
+  );
   if (result.changes !== 1) throw new GameError(409, "Game already finished");
 
   return { rounds, games: gamesPlayed(name) };

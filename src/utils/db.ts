@@ -4,6 +4,14 @@ import { dirname } from "node:path";
 
 const DB_PATH = process.env.DB_PATH ?? "./data/focus.db";
 
+// Obergrenze für die Datei: 12800 Seiten à 4 KiB = 50 MiB. Ist sie erreicht, schlägt jeder
+// Schreibversuch mit SQLITE_FULL fehl, statt die Platte des Servers zu füllen.
+// Ein beendetes Spiel braucht rund 100 Byte, das reicht für mehrere Hunderttausend Spiele.
+const MAX_PAGES = Number(process.env.DB_MAX_PAGES) || 12800;
+
+export const isDiskFull = (err: unknown) =>
+  err instanceof Error && /SQLITE_FULL|database or disk is full/i.test(err.message);
+
 // Einmalige Änderungen an den Daten, der Reihe nach. Wie viele schon gelaufen sind,
 // steht in PRAGMA user_version; jede läuft also genau einmal pro Datenbank.
 const MIGRATIONS = [
@@ -12,6 +20,8 @@ const MIGRATIONS = [
   // 2: Testeinträge entfernt, nur echte Spiele bleiben. Echte Spiele speichern
   //    die Lösungen ihrer Boards, Testeinträge hatten eine leere Liste.
   "DELETE FROM games WHERE solutions = '[]'",
+  // 3: Lösungen beendeter Spiele leeren; sie werden nur bis zum Spielende gebraucht
+  "UPDATE games SET solutions = '' WHERE finished_at IS NOT NULL",
 ];
 
 let db: DatabaseSync | undefined;
@@ -23,7 +33,10 @@ export const getDB = () => {
   mkdirSync(dirname(DB_PATH), { recursive: true });
   db = new DatabaseSync(DB_PATH);
   db.exec(`
+    PRAGMA page_size = 4096;
     PRAGMA journal_mode = WAL;
+    PRAGMA journal_size_limit = 4194304;
+    PRAGMA max_page_count = ${MAX_PAGES};
     CREATE TABLE IF NOT EXISTS games (
       id          TEXT PRIMARY KEY,
       color       TEXT NOT NULL,
