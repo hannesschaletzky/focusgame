@@ -10,6 +10,11 @@ updates:
     groups:
       npm:
         update-types: [minor, patch]
+    ignore:
+      # TypeScript 7 erst, wenn typescript-eslint (in eslint-config-next) es unterstützt:
+      # https://github.com/typescript-eslint/typescript-eslint/issues/10940
+      - dependency-name: typescript
+        versions: [">=7"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
