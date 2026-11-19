@@ -1,0 +1,28 @@
+# Monatlich, je Ökosystem ein gruppierter PR für Minor- und Patch-Updates. Die merged der CI-Job
+# "automerge" selbst, sobald der Build grün ist (workflows/ci.yml); der Merge deployt. Major-Updates
+# kommen als eigene PRs und werden von Hand geprüft. Sicherheitsupdates kommen sofort, unabhängig davon.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      npm:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        update-types: [minor, patch]
+  # Basis-Images im Dockerfile (exakte Versionen): So kommen auch Sicherheitsupdates von Node und
+  # Caddy jeden Monat ins Image, selbst wenn am Repo sonst niemand arbeitet.
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      images:
+        update-types: [minor, patch]

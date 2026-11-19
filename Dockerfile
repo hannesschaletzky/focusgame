@@ -1,12 +1,12 @@
 # syntax=docker/dockerfile:1
-FROM node:24-alpine AS build
+FROM node:24.22.3-alpine3.24 AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:24-alpine
+FROM node:24.22.3-alpine3.24
 ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0 DB_PATH=/data/focus.db
 WORKDIR /app
 # standalone enthält nur, was der Server braucht; static und public liefert Next nicht automatisch mit
